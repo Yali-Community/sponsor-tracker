@@ -1,0 +1,58 @@
+:root {
+  font-family: ui-rounded, 'Avenir Next', 'Segoe UI', sans-serif;
+  color: #392e33;
+  background: #fffaf7;
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  min-width: 240px;
+}
+
+main {
+  max-width: 960px;
+  margin-inline: auto;
+  padding: clamp(48px, 10vw, 112px) 24px;
+}
+
+h1 {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 14px;
+  margin: 0;
+  font-size: clamp(32px, 6vw, 48px);
+  font-weight: 700;
+  line-height: 1.2;
+  letter-spacing: -0.035em;
+}
+
+.heart {
+  width: 0.85em;
+  height: 0.85em;
+  flex-shrink: 0;
+  fill: #ef7a96;
+  stroke: #cb4d70;
+  stroke-width: 1.5;
+  stroke-linejoin: round;
+  transform: rotate(10deg);
+}
+
+.heart-shine {
+  fill: none;
+  stroke: #fff0f4;
+  stroke-width: 2.5;
+  stroke-linecap: round;
+}
+
+::selection {
+  color: #392e33;
+  background: #ffd7e2;
+}
