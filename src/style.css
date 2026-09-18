@@ -119,6 +119,8 @@ button, input, select, textarea { font: inherit; }
 button:disabled { cursor: wait; opacity: 0.6; }
 .sponsor-cta { display: inline-flex; align-items: center; gap: 24px; padding: 10px 16px; border: 1px solid var(--line); border-radius: 8px; background: transparent; font-size: 13px; font-weight: 600; transition: background 180ms, border-color 180ms; }
 .sponsor-cta:hover { background: #f4ece9; border-color: #a84664; }
+.sponsor-label { display: inline-flex; align-items: center; gap: 8px; }
+.sponsor-label .lucide { color: #c95072; fill: #ef7a96; }
 .cta-circles { display: flex; padding-left: 10px; }
 .cta-circles img { width: 28px; height: 28px; object-fit: cover; border: 2px solid #fffaf7; border-radius: 50%; margin-left: -10px; }
 dialog { width: min(940px, calc(100% - 32px)); max-height: calc(100dvh - 32px); padding: 48px 32px 32px; color: #392e33; background: #fffaf7; border: 1px solid var(--line); border-radius: 16px; box-shadow: 0 24px 80px #392e3329; overflow-y: auto; }
