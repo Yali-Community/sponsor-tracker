@@ -4,6 +4,7 @@ import { get, put, del } from '@vercel/blob'
 import { validateSubmission, HttpError } from '../server/validation.ts'
 import { readRecords, updateRecords, claimOnce, limit, csvFor, publicRecord, publicSponsors, type ReviewRecord } from '../server/store.ts'
 import { createSponsorChallenge, confirmSponsorCode, requireSponsorVerification } from '../server/sponsor-auth.ts'
+import { checkSubmissionLimit } from '../server/submission-limit.ts'
 import { checkOrigin, requireAdmin, adminSession, signToken, verifyToken, namespace, hash } from '../server/security.ts'
 import { sendEmail } from '../server/email.ts'
 import { notify, deliveryInProgress } from '../server/notifications.ts'
@@ -113,9 +114,6 @@ export default async function handler(req: Request, res: ServerResponse) {
       const account = current.find(record => record.user_id.toLowerCase() === userId)
       if (account) requireSponsorVerification(input.verification, userId, input.request_id)
       const submission = validateSubmission(account ? { ...input, name: account.name, email: account.email, social_id: account.social_id, photo: '' } : input)
-      const ip = String(req.headers['x-forwarded-for'] || req.socket.remoteAddress || 'unknown').split(',')[0]
-      await limit(`submit-ip:${ip}`, 60)
-      await limit(`submit-email:${submission.email}`, 300)
       let photoPath = ''
       let saved = false
       try {
@@ -136,6 +134,7 @@ export default async function handler(req: Request, res: ServerResponse) {
         await updateRecords(records => {
           if (records.some(item => item.user_id.toLowerCase() === record.user_id)) requireSponsorVerification(input.verification, record.user_id, record.request_id)
           if (records.some(item => item.transaction_id.toLowerCase() === record.transaction_id.toLowerCase())) throw new HttpError(409, 'This payment reference has already been submitted.')
+          checkSubmissionLimit(records, record.email)
           records.push(record)
         })
         saved = true
@@ -176,7 +175,10 @@ export default async function handler(req: Request, res: ServerResponse) {
     }
     throw new HttpError(404, 'Not found.')
   } catch (error) {
-    if (error instanceof HttpError) return json(res, error.status, { error: error.message, code: error.code })
+    if (error instanceof HttpError) {
+      if (error.retryAfter) res.setHeader('Retry-After', error.retryAfter)
+      return json(res, error.status, { error: error.message, code: error.code, retryAfter: error.retryAfter })
+    }
     console.error('Sponsorship request failed:', error instanceof Error ? error.name : 'UnknownError')
     return json(res, 503, { error: 'We couldn’t complete this request. Please try again shortly.' })
   }

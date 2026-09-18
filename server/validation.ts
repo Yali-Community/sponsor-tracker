@@ -1,7 +1,10 @@
 export class HttpError extends Error {
   status: number
   code?: string
-  constructor(status: number, message: string, code?: string) { super(message); this.status = status; this.code = code }
+  retryAfter?: number
+  constructor(status: number, message: string, code?: string, retryAfter?: number) {
+    super(message); this.status = status; this.code = code; this.retryAfter = retryAfter
+  }
 }
 export interface Submission {
   request_id: string

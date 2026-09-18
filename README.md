@@ -33,7 +33,7 @@ Configure these **server-only** variables in Vercel (see `.env.example`):
 - `ADMIN_EMAIL`: destination for admin sign-in links.
 - `ADMIN_SESSION_SECRET`: a cryptographically random secret of at least 32 characters.
 
-Never use a `VITE_` prefix or commit real credentials. Admin links expire after 10 minutes and can only be used once. Sessions expire after eight hours and use Secure, HttpOnly, SameSite cookies. Sign-in emails and submissions are rate-limited; exported CSV neutralizes spreadsheet formulas.
+Never use a `VITE_` prefix or commit real credentials. Admin links expire after 10 minutes and can only be used once. Sessions expire after eight hours and use Secure, HttpOnly, SameSite cookies. Sign-in emails and verification codes are rate-limited. Submissions allow up to ten successfully saved requests per email in a rolling five-minute window, checked atomically with the CSV write. Failed validation and idempotent retries do not consume this allowance; there is no per-IP submission cooldown. A genuine limit response includes a Retry-After value. Exported CSV neutralizes spreadsheet formulas.
 
 Email outages do not remove a saved request. Delivery state is visible in the admin view. Storage failures show an error and preserve form input. Duplicate form retries reuse a request ID.
 
