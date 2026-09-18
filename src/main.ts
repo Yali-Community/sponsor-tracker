@@ -103,7 +103,18 @@ try {
     const identity = element('div', 'identity')
     identity.append(element('h3', '', sponsor.name))
     identity.append(element('p', 'user-id', `@${sponsor.user_id}`))
-    if (sponsor.social_id) identity.append(element('p', 'social-id', sponsor.social_id))
+    if (sponsor.social_id) {
+      const social = element('p', 'social-id')
+      try {
+        const url = new URL(sponsor.social_id)
+        if (url.protocol !== 'https:' || url.username || url.password) throw new Error()
+        const link = document.createElement('a')
+        link.href = url.href; link.target = '_blank'; link.rel = 'noopener noreferrer'
+        link.textContent = sponsor.social_id.replace(/^https:\/\//, '')
+        social.append(link)
+      } catch { social.textContent = sponsor.social_id }
+      identity.append(social)
+    }
     heading.append(avatar(sponsor, index), identity)
     selected.append(heading, element('p', 'selected-amount', `${formatAmount(sponsor.amount)} contributed`))
     if (sponsor.notes) selected.append(element('p', 'notes', sponsor.notes))
