@@ -1,6 +1,21 @@
 # Sponsor tracker
 
-A minimal TypeScript and Vite website with a Sponsors heading and a pink heart.
+A minimal TypeScript and Vite sponsor wall with a pink heart, pastel avatars, and a total calculated from CSV.
+
+## Sponsor data
+
+Edit `sponsors.example.csv` in the repository root. The page imports it at build time; rebuild and redeploy after changing it. Every row appears in the avatar wall and contributions list. All included entries are fictional sample data.
+
+- `profile_picture`: HTTPS image URL or a root-relative path to an image in `public/`. Blank or failed images display initials.
+- `name`: sponsor name (required).
+- `social_id`: plain text, not restricted to a platform.
+- `amount`: non-negative INR amount, with up to two decimal places and no currency symbol or grouping commas.
+- `transaction_id`: plain text reference.
+- `notes`: optional text. Quote values that contain commas, quotes, or line breaks using normal CSV escaping.
+
+Select an avatar or contribution to see the sponsor's details. The shipped sample label is in `index.html`; update it when replacing the sample data. All six fields are included in the public site, so only add data intended for public display.
+
+The page supports keyboard selection, image fallbacks, empty/error states, and reduced-motion preferences.
 
 ## Development
 
@@ -19,6 +34,8 @@ npm run preview
 ```
 
 The build checks TypeScript and generates the static site in `dist/`.
+
+Run `npm test` for CSV parsing, amount validation, total calculation, and profile URL tests.
 
 ## Deploy to Vercel
 
