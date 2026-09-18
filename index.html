@@ -24,14 +24,56 @@
             <p class="tamil-tagline" lang="ta">உங்கள் ஆதரவு, எங்கள் வலிமை.</p>
           </div>
         </div>
-        <span class="demo-label">Sample sponsors</span>
+        <button id="sponsor-button" class="sponsor-cta" type="button" aria-haspopup="dialog">
+          <span>Sponsor</span><span class="cta-circles" aria-hidden="true"><i></i><i></i><i></i></span>
+        </button>
       </header>
       <div class="layout" id="sponsors-app">
         <p role="status">Loading sponsors…</p>
       </div>
       <noscript>Enable JavaScript to view the sponsor wall.</noscript>
-      <footer><span>A little support. A lot of possibility.</span><span lang="ta">ஆதரவளிக்கும் ஒவ்வொருவருக்கும் நன்றி.</span></footer>
+      <footer><span>A little support. A lot of possibility.</span><span lang="ta">ஆதரவளிக்கும் ஒவ்வொருவருக்கும் நன்றி.</span><a href="/admin.html">Admin</a></footer>
     </main>
+    <dialog id="sponsor-dialog" aria-labelledby="sponsor-dialog-title">
+      <button type="button" class="dialog-close quiet-button" data-close-dialog aria-label="Close sponsor form">Close</button>
+      <div class="donation-layout">
+        <section class="payment-panel">
+          <h2 id="sponsor-dialog-title">A little support.<br>A lasting impact.</h2>
+          <p lang="ta">உங்கள் ஆதரவு, எங்கள் வலிமை.</p>
+          <img src="/payment-qr.jpeg" class="payment-qr" alt="Mohan's UPI payment QR code. UPI ID: mohn08052006@okicici" width="1152" height="1600" />
+          <p class="payment-instructions">Scan with any UPI app, complete your payment, then share the details for review.</p>
+          <p class="upi-id">mohn08052006@okicici</p>
+        </section>
+        <section class="submission-panel">
+          <form id="sponsor-form">
+            <h3>Your sponsorship</h3>
+            <p class="form-intro">Already paid? Tell us a little about yourself.</p>
+            <div class="form-fields">
+              <label>Name<input name="name" autocomplete="name" maxlength="80" required /></label>
+              <label>User ID<input name="user_id" placeholder="john.doe" pattern="[a-zA-Z0-9._]{1,30}" maxlength="30" autocomplete="username" required /><small>Unique handle. Letters, numbers, dots or underscores.</small></label>
+              <label class="full-width">Email<input name="email" type="email" autocomplete="email" maxlength="254" required /><small>For your confirmation and approval updates. Kept private.</small></label>
+              <label>Amount (₹)<input name="amount" type="number" min="0.01" max="1000000" step="0.01" inputmode="decimal" required /></label>
+              <label>Payment date &amp; time<input name="paid_at" type="datetime-local" required /></label>
+              <label class="full-width">UPI transaction ID<input name="transaction_id" maxlength="100" required /><small>Your payment reference, visible only to the admin.</small></label>
+              <label class="full-width">Social ID <span>(optional)</span><input name="social_id" maxlength="100" placeholder="Any social handle" /></label>
+              <label class="full-width">Profile photo <span>(optional)</span><input name="photo" type="file" accept="image/png,image/jpeg" /><small>PNG or JPEG, up to 1 MB. Initials are used if omitted.</small></label>
+              <label class="full-width">Note <span>(optional)</span><textarea name="notes" rows="2" maxlength="500" placeholder="A few words of support…"></textarea></label>
+            </div>
+            <label class="honeypot" aria-hidden="true">Website<input name="website" tabindex="-1" autocomplete="off" /></label>
+            <label class="consent"><input name="consent" type="checkbox" required /><span>I agree to publish my name, user ID, social ID, photo, amount, payment time and note after approval. My email and payment reference stay private.</span></label>
+            <p id="form-message" class="form-message" role="alert"></p>
+            <button type="submit" class="primary-button">Send for review</button>
+          </form>
+          <div id="submission-success" class="submission-success" tabindex="-1" hidden>
+            <h3>Your request is under review.</h3>
+            <p>Thank you for supporting Yali. Your sponsorship will be posted after your payment is verified and your entry is approved.</p>
+            <p id="email-result"></p>
+            <p id="request-reference" class="muted"></p>
+            <button type="button" class="primary-button" data-close-dialog>Done</button>
+          </div>
+        </section>
+      </div>
+    </dialog>
     <script type="module" src="/src/main.ts"></script>
   </body>
 </html>

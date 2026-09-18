@@ -111,3 +111,76 @@ footer { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 10
 @media (prefers-reduced-motion: reduce) {
   .contribution:hover, .contribution:active { transform: none; }
 }
+
+/* Sponsorship submission and private review. */
+[hidden] { display: none !important; }
+a { color: inherit; text-underline-offset: 4px; }
+button, input, select, textarea { font: inherit; }
+button:disabled { cursor: wait; opacity: 0.6; }
+.sponsor-cta { display: inline-flex; align-items: center; gap: 24px; padding: 10px 16px; border: 1px solid var(--line); border-radius: 8px; background: transparent; font-size: 13px; font-weight: 600; transition: background 180ms, border-color 180ms; }
+.sponsor-cta:hover { background: #f4ece9; border-color: #a84664; }
+.cta-circles { display: flex; padding-left: 10px; }
+.cta-circles i { width: 26px; height: 26px; border: 2px solid #392e33; border-radius: 50%; margin-left: -10px; background: #aeddf1; }
+.cta-circles i:nth-child(2) { background: #f9e8aa; }
+.cta-circles i:nth-child(3) { background: #bfe9ca; }
+dialog { width: min(940px, calc(100% - 32px)); max-height: calc(100dvh - 32px); padding: 48px 32px 32px; color: #392e33; background: #fffaf7; border: 1px solid var(--line); border-radius: 16px; box-shadow: 0 24px 80px #392e3329; overflow-y: auto; }
+dialog::backdrop { background: #241b2280; }
+dialog[open] { animation: arrive 250ms var(--ease); }
+.dialog-close { position: absolute; top: 10px; right: 14px; }
+.donation-layout { display: grid; grid-template-columns: 260px minmax(0, 1fr); gap: 36px; }
+.payment-panel h2 { font-size: 26px; font-weight: 600; letter-spacing: -0.035em; line-height: 1.3; }
+.payment-panel [lang=ta] { font-size: 11px; margin-top: 14px; color: var(--muted); }
+.payment-qr { display: block; width: 100%; height: auto; margin-block: 20px 12px; border-radius: 12px; }
+.payment-instructions, .upi-id { font-size: 12px; line-height: 1.7; overflow-wrap: anywhere; }
+.upi-id { font-weight: 600; margin-top: 6px; }
+.submission-panel h3 { font-size: 21px; }
+.form-intro { color: var(--muted); font-size: 12px; line-height: 1.7; margin: 8px 0 24px; }
+.form-fields { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+.form-fields label { display: flex; flex-direction: column; min-width: 0; font-size: 12px; font-weight: 600; gap: 6px; }
+.form-fields label > span { color: var(--muted); font-weight: 400; }
+.full-width { grid-column: 1 / -1; }
+input:not([type=checkbox]), textarea, select { min-width: 0; width: 100%; padding: 11px 12px; color: #392e33; background: #fff; border: 1px solid #d6c8cc; border-radius: 6px; font-size: 14px; caret-color: #a84664; }
+input::placeholder, textarea::placeholder { color: #77666d; }
+input:focus-visible, textarea:focus-visible, select:focus-visible, a:focus-visible { outline: 2px solid #a84664; outline-offset: 3px; }
+textarea { resize: vertical; }
+.form-fields small { color: var(--muted); font-size: 10px; font-weight: 400; line-height: 1.6; }
+.consent { display: flex; align-items: flex-start; gap: 10px; margin-top: 20px; font-size: 11px; line-height: 1.7; color: var(--muted); }
+.consent input { margin-top: 3px; accent-color: #a84664; }
+.honeypot { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); }
+.form-message { color: #9b274e; font-size: 12px; line-height: 1.6; margin-block: 16px; }
+.primary-button, .quiet-button { border-radius: 6px; min-height: 42px; padding: 10px 16px; border: 1px solid var(--line); font-size: 12px; }
+.primary-button { background: #392e33; border-color: #392e33; color: #fffaf7; }
+.primary-button:hover { background: #59444f; }
+.quiet-button { background: transparent; }
+.quiet-button:hover { background: #f4ece9; }
+.submission-success { padding-block: 32px; outline: none; }
+.submission-success p { font-size: 13px; line-height: 1.8; margin-top: 16px; overflow-wrap: anywhere; }
+.submission-success button { margin-top: 24px; }
+.admin-intro { max-width: 65ch; font-size: 14px; line-height: 1.8; margin-block: 30px 20px; }
+#admin-message { min-height: 24px; font-size: 13px; line-height: 1.7; margin-bottom: 20px; overflow-wrap: anywhere; }
+#admin-login p { margin: 16px 0 24px; line-height: 1.7; }
+.admin-toolbar { display: flex; flex-wrap: wrap; align-items: center; gap: 16px; padding-block: 16px; }
+.admin-toolbar label { display: flex; align-items: center; gap: 8px; font-size: 13px; }
+.admin-toolbar a { font-size: 13px; }
+.review-entry { padding-block: 28px; border-bottom: 1px solid var(--line); }
+.review-heading { display: flex; align-items: center; gap: 16px; }
+.review-heading img { border-radius: 50%; object-fit: cover; }
+.review-heading h2 { font-size: 20px; overflow-wrap: anywhere; }
+.review-amount { margin-left: auto; font-size: 20px; font-weight: 600; }
+.review-details { display: grid; grid-template-columns: 140px minmax(0, 1fr); gap: 10px 16px; font-size: 13px; line-height: 1.7; }
+.review-details dt { color: var(--muted); }
+.review-details dd { margin: 0; overflow-wrap: anywhere; white-space: pre-line; }
+.review-actions { display: flex; flex-wrap: wrap; gap: 12px; margin-top: 20px; }
+@media (max-width: 700px) {
+  dialog { padding: 52px 20px 24px; }
+  .donation-layout { grid-template-columns: 1fr; gap: 28px; }
+  .payment-qr { width: min(100%, 240px); margin-inline: auto; }
+  .payment-panel { text-align: center; }
+  .form-fields { grid-template-columns: 1fr; }
+  input:not([type=checkbox]), textarea, select { font-size: 16px; }
+  .review-details { grid-template-columns: 100px minmax(0, 1fr); }
+}
+@media (prefers-reduced-motion: reduce) {
+  dialog[open] { animation: none; }
+  .sponsor-cta { transition: none; }
+}

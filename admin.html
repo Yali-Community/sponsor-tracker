@@ -1,0 +1,33 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="robots" content="noindex, nofollow" />
+  <meta name="referrer" content="no-referrer" />
+  <title>Sponsor review · Yali</title>
+  <link rel="icon" href="/heart.svg" type="image/svg+xml" />
+</head>
+<body>
+  <main class="page admin-page">
+    <header class="page-header"><h1>Sponsor review</h1><a href="/">Back to sponsors</a></header>
+    <p class="admin-intro">Verify the payment reference against your UPI account before approving. Submitting a form does not verify a payment.</p>
+    <p id="admin-message" role="status" aria-live="polite"></p>
+    <section id="admin-login">
+      <h2>Sign in to review</h2>
+      <p>A private sign-in link will be sent to the configured admin email.</p>
+      <button id="send-login" class="primary-button">Email me a sign-in link</button>
+    </section>
+    <section id="admin-content" hidden>
+      <div class="admin-toolbar">
+        <label>Status <select id="status-filter"><option value="pending">Pending</option><option value="approved">Approved</option><option value="rejected">Rejected</option></select></label>
+        <a href="/api/sponsorship?action=export" class="text-link">Download admin CSV</a>
+        <button id="admin-refresh" class="quiet-button">Refresh</button>
+        <button id="admin-logout" class="quiet-button">Sign out</button>
+      </div>
+      <div id="review-list"></div>
+    </section>
+  </main>
+  <script type="module" src="/src/admin.ts"></script>
+</body>
+</html>

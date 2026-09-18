@@ -4,6 +4,7 @@ import '@fontsource/manrope/latin-600.css'
 import '@fontsource/manrope/latin-700.css'
 import '@fontsource/noto-sans-tamil/tamil-400.css'
 import './style.css'
+import './submission'
 import csv from '../sponsors.example.csv?raw'
 import { parseSponsors, profileUrl, relativePaymentTime, totalAmount, type Sponsor } from './sponsors'
 
@@ -35,8 +36,16 @@ function avatar(sponsor: Sponsor, index: number) {
   }
   return node
 }
+async function loadSponsors() {
 try {
-  const sponsors = parseSponsors(csv)
+  let sponsors: Sponsor[]
+  if (import.meta.env.DEV) {
+    sponsors = parseSponsors(csv)
+  } else {
+    const response = await fetch('/api/sponsorship?action=public')
+    if (!response.ok) throw new Error('Please refresh the page in a moment.')
+    sponsors = await response.json()
+  }
   const total = totalAmount(sponsors)
   app.replaceChildren()
   const summary = element('section', 'summary')
@@ -138,7 +147,9 @@ try {
 } catch (error) {
   const message = element('div', 'error-state')
   message.setAttribute('role', 'alert')
-  message.append(element('h2', '', 'We couldn’t load the sponsors.'), element('p', '', 'Check the sponsor CSV and rebuild the site.'))
+  message.append(element('h2', '', 'We couldn’t load the sponsors.'), element('p', '', 'Please refresh the page in a moment.'))
   if (error instanceof Error) message.append(element('p', 'muted', error.message))
   app.replaceChildren(message)
 }
+}
+void loadSponsors()

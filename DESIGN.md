@@ -39,7 +39,7 @@ The heart supplies the pink accent; rose marks focus and selected portraits. Ink
 
 ## Typography
 
-Use bundled Manrope, with weights 400–700. The total is the strongest type; amounts use tabular numerals. The page title is 25px and wall headline 24px. Supporting text ranges from 10–14px. Long names and notes wrap. Transaction IDs stay in CSV data and are never rendered.
+Use bundled Manrope, with weights 400–700. The total is the strongest type; amounts use tabular numerals. The page title is 25px and wall headline 24px. Supporting text ranges from 10–14px. Long names and notes wrap. Transaction IDs are visible only in the authenticated admin view.
 
 ## Layout
 
@@ -53,7 +53,7 @@ Keep surfaces flat with thin dividers. Hovered portraits gain a faint shadow, 5p
 
 ## Shapes
 
-Circular portraits are the signature. Contribution rows and sponsor buttons have softly rounded interaction areas; the sample-data label is a bordered pill.
+Circular portraits are the signature. Contribution rows and sponsor buttons have softly rounded interaction areas; the Sponsor action pairs a label with three overlapping pastel circles.
 
 ## Components
 
@@ -62,8 +62,9 @@ Circular portraits are the signature. Contribution rows and sponsor buttons have
 - **Selection:** native sponsor and contribution buttons select the same record and synchronize `aria-pressed`. Tab navigates; Enter and Space activate. Focus uses a 2px rose outline with 5px offset. A polite, atomic live region announces details. Mobile selection scrolls details into view without moving focus.
 - **Portraits:** valid HTTPS or root-relative photos cover circles; missing or failed photos reveal initials. Decorative images are hidden from assistive technology; buttons announce the sponsor and amount.
 - **Motion:** arrival lasts 750ms, staggered by 35ms up to 500ms. Portrait hover transitions last 450ms; row background transitions last 180ms. Reduced motion disables animation, transitions, hover transforms, and smooth detail scrolling.
-- **CSV:** `sponsors.example.csv` is bundled at build time; changes require rebuilding. Columns are `profile_picture`, `name`, `social_id`, `amount`, `transaction_id`, and `notes`. Names and nonnegative amounts with up to two decimals are required. Derive INR totals and counts from rows; preserve CSV order. Render values as text and show optional details only when populated.
-- **Data states:** a header-only CSV shows a zero summary and empty wall, hiding details and contributions. Invalid data displays an alert with correction and rebuild guidance. Retain the sample-data label while using example records.
+- **Data:** production loads approved entries from the API. The sample CSV is local-development data only. Public fields exclude email and payment references. Empty approved data shows a zero total and a welcoming empty wall.
+- **Sponsor form:** a native modal pairs the supplied QR with labeled fields. Mobile stacks the QR above the form. Preserve input on errors, reuse request IDs for retries, and focus the saved-pending confirmation after success.
+- **Admin:** email-link sign-in protects pending requests and CSV export. Review cards expose payment details for manual checking, with approve, reject, and email retry actions. Logout clears private rows and invalidates stale loads.
 
 ## Do's and Don'ts
 
@@ -71,4 +72,4 @@ The contribution feed uses small avatars and “Name paid ₹amount” sentences
 
 - Do preserve the ivory canvas, pink heart, pastel circles, visible focus, and restrained motion.
 - Do synchronize selected details between both entry points.
-- Don't imply example records are verified sponsors or CSV edits automatically update deployed builds.
+- Don't imply submitting a reference verifies payment; publish only after admin approval.
