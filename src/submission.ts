@@ -32,8 +32,8 @@ function showExisting() {
   warning.hidden = false
   returning = true
   profileFields(true)
-  document.querySelector('#existing-user-copy')!.textContent = `@${userId.value.trim().toLowerCase()} is already registered. Verify the email saved for this ID to sponsor again. We’ll reuse the saved name, email and profile photo.`
-  setUserStatus(verification ? 'Email verified. Ready for your next contribution.' : 'User ID already exists — verify your email to continue.', verification ? 'available' : 'taken')
+  document.querySelector('#existing-user-copy')!.textContent = `@${userId.value.trim().toLowerCase()} is already registered. Verify the email saved for this username to sponsor again. We’ll reuse the saved name, email and profile photo.`
+  setUserStatus(verification ? 'Email verified. Ready for your next contribution.' : 'Username already exists — verify your email to continue.', verification ? 'available' : 'taken')
 }
 function resetUserCheck() {
   checkVersion++
@@ -53,17 +53,17 @@ async function checkUserId() {
   const version = ++checkVersion
   const id = userId.value.trim().toLowerCase()
   if (!/^[a-z0-9._]{1,30}$/.test(id)) return false
-  setUserStatus('Checking user ID…')
+  setUserStatus('Checking username…')
   try {
     const response = await fetch(`/api/sponsorship?action=check-user-id&user_id=${encodeURIComponent(id)}`)
     if (!response.ok) throw new Error()
     const result = await response.json()
     if (version !== checkVersion) return false
     if (result.exists) showExisting()
-    else { warning.hidden = true; returning = false; profileFields(false); setUserStatus('This user ID is available.', 'available') }
+    else { warning.hidden = true; returning = false; profileFields(false); setUserStatus('This username is available.', 'available') }
     return true
   } catch {
-    if (version === checkVersion) setUserStatus('Could not check this ID. Please try again before submitting.', 'taken')
+    if (version === checkVersion) setUserStatus('Could not check this username. Please try again before submitting.', 'taken')
     return false
   }
 }
@@ -84,7 +84,7 @@ sendCode.addEventListener('click', async () => {
     if (id !== userId.value.trim().toLowerCase()) return
     challenge = result.challenge
     codeEntry.hidden = false
-    verificationMessage.textContent = 'Code sent to the email registered with this ID. It expires in 10 minutes.'
+    verificationMessage.textContent = 'Code sent to the email registered with this username. It expires in 10 minutes.'
     codeInput.focus()
   } catch (error) { if (id === userId.value.trim().toLowerCase()) verificationMessage.textContent = (error as Error).message }
   finally { sendCode.disabled = false }
@@ -132,7 +132,7 @@ form.addEventListener('submit', async event => {
   message.textContent = ''
   try {
     clearTimeout(checkTimer)
-    if (!await checkUserId()) throw new Error('Please check your user ID and try again.')
+    if (!await checkUserId()) throw new Error('Please check your username and try again.')
     if (returning && !verification) throw new Error('Verify your saved email before sending this contribution.')
     if (!form.reportValidity()) return
     const data = new FormData(form)

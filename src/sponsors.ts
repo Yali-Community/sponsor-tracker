@@ -26,7 +26,7 @@ export function parseSponsors(csv: string): Sponsor[] {
     const userId = row.user_id.trim().toLowerCase()
     const paidAt = row.paid_at.trim()
     if (!/^[a-z0-9._]{1,30}$/.test(userId) || userIds.has(userId)) {
-      throw new Error(`CSV row ${index + 2} needs a unique user_id (letters, numbers, dots, or underscores; up to 30 characters).`)
+      throw new Error(`CSV row ${index + 2} needs a unique username (letters, numbers, dots, or underscores; up to 30 characters).`)
     }
     userIds.add(userId)
     const timestamp = Date.parse(paidAt)

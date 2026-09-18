@@ -21,14 +21,15 @@ export interface Submission {
 export function validateSubmission(input: Record<string, unknown>, now = Date.now()): Submission {
   function text(key: string, max: number, required = true) {
     const value = input[key]
-    if (typeof value !== 'string' || value.trim().length > max || /[\u0000-\u0008\u000b\u000c\u000e-\u001f]/.test(value)) throw new HttpError(400, `Check ${key.replaceAll('_', ' ')}.`)
-    if (required && !value.trim()) throw new HttpError(400, `Enter ${key.replaceAll('_', ' ')}.`)
+    const label = key === 'user_id' ? 'username' : key.replaceAll('_', ' ')
+    if (typeof value !== 'string' || value.trim().length > max || /[\u0000-\u0008\u000b\u000c\u000e-\u001f]/.test(value)) throw new HttpError(400, `Check ${label}.`)
+    if (required && !value.trim()) throw new HttpError(400, `Enter ${label}.`)
     return value.trim()
   }
   const request_id = text('request_id', 36)
   if (!/^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(request_id)) throw new HttpError(400, 'Reload the form and try again.')
   const user_id = text('user_id', 30).toLowerCase()
-  if (!/^[a-z0-9._]{1,30}$/.test(user_id)) throw new HttpError(400, 'Use letters, numbers, dots or underscores for your user ID.')
+  if (!/^[a-z0-9._]{1,30}$/.test(user_id)) throw new HttpError(400, 'Use letters, numbers, dots or underscores for your username.')
   const name = text('name', 80)
   const email = text('email', 254).toLowerCase()
   if (!/^[^\s@<>]+@[^\s@<>]+\.[^\s@<>]+$/.test(email)) throw new HttpError(400, 'Enter a valid email address.')

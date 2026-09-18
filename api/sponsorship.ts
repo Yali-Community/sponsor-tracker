@@ -29,7 +29,7 @@ export default async function handler(req: Request, res: ServerResponse) {
       }
       if (action === 'check-user-id') {
         const userId = (url.searchParams.get('user_id') || '').trim().toLowerCase()
-        if (!/^[a-z0-9._]{1,30}$/.test(userId)) throw new HttpError(400, 'Enter a valid user ID.')
+        if (!/^[a-z0-9._]{1,30}$/.test(userId)) throw new HttpError(400, 'Enter a valid username.')
         const { records } = await readRecords()
         return json(res, 200, { exists: records.some(record => record.user_id.toLowerCase() === userId) })
       }
@@ -62,9 +62,9 @@ export default async function handler(req: Request, res: ServerResponse) {
     if (action === 'send-sponsor-code') {
       const userId = typeof input.user_id === 'string' ? input.user_id.trim().toLowerCase() : ''
       const requestId = typeof input.request_id === 'string' ? input.request_id : ''
-      if (!/^[a-z0-9._]{1,30}$/.test(userId) || !/^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(requestId)) throw new HttpError(400, 'Check your user ID and reload the form.')
+      if (!/^[a-z0-9._]{1,30}$/.test(userId) || !/^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(requestId)) throw new HttpError(400, 'Check your username and reload the form.')
       const account = (await readRecords()).records.find(record => record.user_id.toLowerCase() === userId)
-      if (!account) throw new HttpError(404, 'This user ID is available. Enter your profile details to continue.')
+      if (!account) throw new HttpError(404, 'This username is available. Enter your profile details to continue.')
       const ip = String(req.headers['x-forwarded-for'] || req.socket.remoteAddress || 'unknown').split(',')[0]
       await limit(`sponsor-code-ip:${ip}`, 60)
       await limit(`sponsor-code-user:${userId}`, 60)
