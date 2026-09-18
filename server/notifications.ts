@@ -7,6 +7,7 @@ export function deliveryInProgress(value: string) {
 }
 export async function notify(record: ReviewRecord, field: 'pending_email' | 'decision_email', dependencies = { updateRecords, sendStatus }) {
   const claim = `sending:${Date.now()}:${randomUUID()}`
+  let deliveryRecord = record
   try {
     const state = await dependencies.updateRecords(records => {
       const current = records.find(item => item.request_id === record.request_id)
@@ -14,12 +15,13 @@ export async function notify(record: ReviewRecord, field: 'pending_email' | 'dec
       if (current[field] === 'sent') return 'sent'
       if (deliveryInProgress(current[field])) return 'skip'
       current[field] = claim
+      deliveryRecord = { ...current }
       return 'claimed'
     })
     if (state !== 'claimed') return state === 'sent'
   } catch { return false }
   let delivered = false
-  try { await dependencies.sendStatus(record); delivered = true } catch { /* Preserve saved requests when email is unavailable. */ }
+  try { await dependencies.sendStatus(deliveryRecord); delivered = true } catch { /* Preserve saved requests when email is unavailable. */ }
   try {
     await dependencies.updateRecords(records => {
       const current = records.find(item => item.request_id === record.request_id)

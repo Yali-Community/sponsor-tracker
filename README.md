@@ -4,13 +4,13 @@ A TypeScript + Vite sponsor wall with a QR payment form and private admin review
 
 ## How it works
 
-1. Click **Sponsor**, scan the supplied UPI QR, and pay using your own UPI app.
-2. Enter your username. For a new username, provide your name and email; social ID and profile photo are optional. For an existing username, verify a six-digit code sent to its saved email; shared profile fields are hidden and reused on the server. Enter the new amount, transaction reference and optional note.
+1. Click **Sponsor** and verify your email with a six-digit code. The details form and UPI QR open after verification. The query number at the top of the page links to **+91 8248777476**.
+2. Scan the QR or use the mobile UPI link, then enter your username and payment details. New users provide a name and optional profile photo. Choose Instagram, X / Twitter, or a custom HTTPS link for an optional social profile. Existing usernames must match the verified email; their saved profile fields are reused.
 3. Submit for review. The server records the submission time automatically. The request is saved as **pending** and a confirmation email is sent.
 4. Open **/admin.html**, request an email sign-in link, and review the payment against your UPI account. Approve to publish or reject to keep it hidden. Approved contributions can be revoked with confirmation; they move to Revoked and leave the public wall and total without issuing a refund. The contributor receives a status email.
 5. The public page shows one profile per username with approved amounts combined, alongside individual contribution entries and their notes. It fetches approved entries on each page load. No rebuild is needed after approval.
 
-The form does **not** verify or initiate payments. Admin approval is manual. Payment references must be unique. Returning sponsors can make multiple contributions under one username after verifying the saved email for each new request. Codes expire after ten minutes and allow five attempts; code requests are rate-limited. Changing the username clears verification. Contact the admin to correct saved profile details.
+The form does **not** verify payments. Admin approval is manual. Payment references must be unique. Every submission requires an email proof bound to its request and email address; this is enforced server-side. Returning sponsors use their saved email for each new request. Codes expire after ten minutes and allow five attempts; code requests are rate-limited. Changing the email clears verification. Admins can correct saved profile details in **All users**.
 
 ## Private CSV and photos
 
@@ -59,3 +59,9 @@ The sample CSV supports quoted values, multiline notes, unique lowercase handles
 Import this repository into Vercel, connect the private Blob store and configure the environment variables. Vercel builds the Vite pages plus `api/sponsorship.ts`. PRs generate previews; merging the production branch deploys production.
 
 The UI preserves the pastel palette, supplied logo, Tamil thank-you lines, keyboard controls, reduced-motion preferences, image fallbacks and newest-first activity times.
+
+### Managing users
+
+Open **All users** in admin to search every submitted username, including pending, rejected and revoked contributions. **Edit user** updates the name, username, email, social ID and profile photo across all contributions for that user. Username conflicts are blocked; changing the email invalidates verification proofs for the previous address. Photos can be replaced or removed.
+
+Expand **View contributions** to edit individual amounts, payment references and notes. Approved changes update the public wall and totals immediately. Submission/review timestamps remain system-managed; use the review queue to approve, reject or revoke. Concurrent edits are rejected with a refresh instruction, and edits wait while a status email is being sent. Profile corrections do not send extra emails.

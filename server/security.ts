@@ -12,7 +12,7 @@ function secret() {
 }
 export function hash(value: string) { return createHmac('sha256', secret()).update(value).digest('hex') }
 type TokenKind = 'login' | 'session' | 'sponsor-code' | 'sponsor-verified'
-export function signToken(kind: TokenKind, seconds: number, details: { user_id?: string; request_id?: string; code_hash?: string } = {}) {
+export function signToken(kind: TokenKind, seconds: number, details: { user_id?: string; request_id?: string; code_hash?: string; account_key?: string } = {}) {
   const payload = Buffer.from(JSON.stringify({ ...details, kind, expires: Date.now() + seconds * 1000, nonce: randomUUID(), scope: namespace() })).toString('base64url')
   return `${payload}.${hash(payload)}`
 }
@@ -23,7 +23,7 @@ export function verifyToken(token: string, kind: TokenKind) {
     if (!timingSafeEqual(Buffer.from(hash(payload)), Buffer.from(signature))) return null
     const data = JSON.parse(Buffer.from(payload, 'base64url').toString())
     if (data.kind !== kind || data.scope !== namespace() || data.expires <= Date.now() || typeof data.nonce !== 'string') return null
-    return data as { nonce: string; expires: number; user_id?: string; request_id?: string; code_hash?: string }
+    return data as { nonce: string; expires: number; user_id?: string; request_id?: string; code_hash?: string; account_key?: string }
   } catch { return null }
 }
 export function adminSession(cookie = '') {

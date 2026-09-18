@@ -1,8 +1,10 @@
+import { userManager } from './admin-users'
 import '@fontsource/manrope/latin-400.css'
 import '@fontsource/manrope/latin-600.css'
 import './style.css'
 
-interface Review {
+export interface Review {
+  version: string
   request_id: string; name: string; user_id: string; email: string; social_id: string
   amount: string; submitted_at: string; transaction_id: string; notes: string; photo_path: string
   status: 'pending' | 'approved' | 'rejected' | 'revoked'; pending_email: string; decision_email: string
@@ -18,6 +20,7 @@ let activeStatus = 'pending'
 let records: Review[] = []
 let generation = 0
 let signingOut = false
+const users = userManager(api, load)
 
 function node(tag: string, text = '', className = '') {
   const element = document.createElement(tag)
@@ -31,7 +34,7 @@ async function api(action: string, data?: object) {
   } : undefined)
   const result = await response.json()
   if (!response.ok) {
-    if (response.status === 401) { generation++; login.hidden = false; content.hidden = true; records = []; list.replaceChildren() }
+    if (response.status === 401) { generation++; login.hidden = false; content.hidden = true; records = []; list.replaceChildren(); users.clear() }
     throw new Error(result.error || 'Request failed.')
   }
   return result
@@ -40,9 +43,10 @@ async function load() {
   if (signingOut) return
   const current = ++generation
   try {
-    const incoming = await api('admin')
+    const [incoming, incomingUsers] = await Promise.all([api('admin'), api('users')])
     if (current !== generation) return
     records = incoming
+    users.setData(incomingUsers, records)
     login.hidden = true
     content.hidden = false
     render()
@@ -131,6 +135,10 @@ function render() {
       retry.addEventListener('click', () => void act('retry-email'))
       actions.append(retry)
     }
+    const edit = document.createElement('button')
+    edit.textContent = 'Edit contribution'; edit.className = 'quiet-button'
+    edit.addEventListener('click', () => users.editContribution(record))
+    actions.append(edit)
     article.append(actions)
     list.append(article)
   }
@@ -151,7 +159,7 @@ document.querySelector('#admin-logout')!.addEventListener('click', async () => {
   try {
     await api('logout', {})
     generation++
-    records = []; list.replaceChildren(); login.hidden = false; content.hidden = true
+    records = []; list.replaceChildren(); users.clear(); login.hidden = false; content.hidden = true
     status.textContent = 'Signed out.'
   } catch (error) { status.textContent = (error as Error).message }
   finally { signingOut = false }

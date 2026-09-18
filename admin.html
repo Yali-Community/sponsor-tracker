@@ -19,7 +19,9 @@
       <button id="send-login" class="primary-button"><span data-icon="mail"></span>Email me a sign-in link</button>
     </section>
     <section id="admin-content" hidden>
-      <div class="review-intro"><div><h2>Your review queue</h2><p>Check each payment in your UPI account before publishing.</p></div><button id="admin-logout" class="quiet-button"><span data-icon="logout"></span>Sign out</button></div>
+      <div class="review-intro"><div><h2 id="admin-section-title">Your review queue</h2><p id="admin-section-description">Check each payment in your UPI account before publishing.</p></div><button id="admin-logout" class="quiet-button"><span data-icon="logout"></span>Sign out</button></div>
+      <nav class="admin-sections" aria-label="Admin sections"><button id="show-reviews" aria-pressed="true">Contributions</button><button id="show-users" aria-pressed="false">All users <span id="user-count">0</span></button></nav>
+      <div id="contributions-panel">
       <div class="review-filters" aria-label="Filter requests">
         <button data-status="pending" aria-pressed="true">Pending <span data-count="pending">0</span></button>
         <button data-status="approved" aria-pressed="false">Approved <span data-count="approved">0</span></button>
@@ -32,8 +34,22 @@
         <button id="admin-refresh" class="quiet-button"><span data-icon="refresh"></span>Refresh</button>
       </div>
       <div id="review-list"></div>
+      </div>
+      <section id="users-panel" hidden>
+        <div class="admin-toolbar"><label class="review-search"><span data-icon="search"></span><input id="user-search" type="search" aria-label="Search users" placeholder="Search name, username or email" /></label><button id="users-refresh" class="quiet-button"><span data-icon="refresh"></span>Refresh</button></div>
+        <div id="users-list"></div>
+      </section>
     </section>
   </main>
+  <dialog id="admin-editor" class="admin-editor" aria-labelledby="editor-title">
+    <form id="admin-edit-form">
+      <div class="editor-heading"><h2 id="editor-title">Edit user</h2><button type="button" id="editor-close" class="quiet-button" aria-label="Close editor"><span data-icon="close"></span></button></div>
+      <p id="editor-description"></p>
+      <div id="editor-fields" class="form-fields"></div>
+      <p id="editor-error" role="alert"></p>
+      <div class="editor-actions"><button type="button" id="editor-cancel" class="quiet-button">Cancel</button><button type="submit" id="editor-save" class="primary-button">Save changes</button></div>
+    </form>
+  </dialog>
   <script type="module" src="/src/admin.ts"></script>
 </body>
 </html>
