@@ -132,6 +132,12 @@ dialog[open] { animation: arrive 250ms var(--ease); }
 .donation-layout { display: grid; grid-template-columns: 260px minmax(0, 1fr); gap: 36px; }
 .payment-panel { align-self: start; }
 .payment-qr { display: block; width: 100%; height: auto; background: #fff; }
+.mobile-upi { display: none; margin-top: 16px; text-align: center; }
+.mobile-upi a { text-decoration: none; min-height: 44px; }
+.mobile-upi p { margin-top: 10px; font-size: 12px; color: var(--muted); overflow-wrap: anywhere; user-select: all; }
+@media (max-width: 700px), (hover: none) {
+  .mobile-upi { display: block; }
+}
 .submission-panel h3 { font-size: 21px; }
 .form-intro { color: var(--muted); font-size: 12px; line-height: 1.7; margin: 8px 0 24px; }
 .form-fields { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
