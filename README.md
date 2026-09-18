@@ -1,6 +1,6 @@
 # Sponsor tracker
 
-A minimal TypeScript and Vite sponsor wall with an orange heart, warm-toned avatars, and a total calculated from CSV.
+A minimal TypeScript and Vite sponsor wall with a pink heart, pastel avatars, and a total calculated from CSV.
 
 ## Sponsor data
 
@@ -44,9 +44,5 @@ Run `npm test` for CSV parsing, amount validation, total calculation, and profil
 Import this repository into Vercel with the repository root as the root directory.
 The included `vercel.json` selects Vite, runs `npm run build`, and publishes `dist/`.
 No environment variables are required.
-
-## Color theme
-
-Colors follow [mohan-bee/yali](https://github.com/mohan-bee/yali/blob/main/src/style.css): paper `#faf7ef`, ink `#20211c`, muted `#626155`, orange `#f58612`, and dividers `#d8d4c8`. Focus uses Yali’s burnt orange `#9c4200`; avatar backgrounds are soft tints that complement this palette.
 
 Contributions are ordered newest first and display a name, paid amount, @user_id, and relative payment time. Times refresh every 30 seconds using the visitor’s clock. Sample timestamps are fixed fictional data, so they naturally age rather than always claiming “just now.”

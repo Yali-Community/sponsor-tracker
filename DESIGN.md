@@ -1,18 +1,18 @@
 ---
 name: Sponsors
-description: A warm, minimal sponsor wall with warm-toned portraits.
+description: A warm, minimal sponsor wall with pastel portraits.
 colors:
-  ivory: "#faf7ef"
-  ink: "#20211c"
-  muted: "#626155"
-  line: "#d8d4c8"
-  heart: "#f58612"
-  focus: "#9c4200"
-  mint: "#f6d6af"
-  butter: "#f3e5c5"
-  blush: "#edc3a1"
-  seafoam: "#e1dfce"
-  lilac: "#f6deb9"
+  ivory: "#fffaf7"
+  ink: "#392e33"
+  muted: "#77666d"
+  line: "#e9dfdf"
+  heart: "#ef7a96"
+  focus: "#a84664"
+  mint: "#bfe9ca"
+  butter: "#f9e8aa"
+  blush: "#f6cbce"
+  seafoam: "#bce9dd"
+  lilac: "#e7c9ef"
 typography:
   body:
     fontFamily: "Manrope, sans-serif"
@@ -31,11 +31,11 @@ rounded:
 
 ## Overview
 
-Preserve the ivory canvas and orange heart identity. Keep the page minimal and sleek, with totals and contributions beside an open grid of warm-toned circular portraits. This document describes source code; browser visual verification has not been performed.
+Preserve the ivory canvas and pink heart identity. Keep the page minimal and sleek, with totals and contributions beside an open grid of pastel circular portraits. This document describes source code; browser visual verification has not been performed.
 
 ## Colors
 
-The heart supplies the orange accent; burnt orange marks focus and selected portraits. Ink and muted text sit on ivory with pale dividers. Five pastel portrait backgrounds cycle through CSV order and do not encode contribution size.
+The heart supplies the pink accent; rose marks focus and selected portraits. Ink and muted text sit on ivory with pale dividers. Five pastel portrait backgrounds cycle through CSV order and do not encode contribution size.
 
 ## Typography
 
@@ -49,7 +49,7 @@ At 1050px, side padding becomes 32px, the summary column 230px, the gutter 38px,
 
 ## Elevation & Depth
 
-Keep surfaces flat with thin dividers. Hovered portraits gain a faint shadow, 5px lift, and slight rotation. Selection uses a burnt-orange outline.
+Keep surfaces flat with thin dividers. Hovered portraits gain a faint shadow, 5px lift, and slight rotation. Selection uses a rose outline.
 
 ## Shapes
 
@@ -57,7 +57,7 @@ Circular portraits are the signature. Contribution rows and sponsor buttons have
 
 ## Components
 
-- **Selection:** native sponsor and contribution buttons select the same record and synchronize `aria-pressed`. Tab navigates; Enter and Space activate. Focus uses a 2px burnt-orange outline with 5px offset. A polite, atomic live region announces details. Mobile selection scrolls details into view without moving focus.
+- **Selection:** native sponsor and contribution buttons select the same record and synchronize `aria-pressed`. Tab navigates; Enter and Space activate. Focus uses a 2px rose outline with 5px offset. A polite, atomic live region announces details. Mobile selection scrolls details into view without moving focus.
 - **Portraits:** valid HTTPS or root-relative photos cover circles; missing or failed photos reveal initials. Decorative images are hidden from assistive technology; buttons announce the sponsor and amount.
 - **Motion:** arrival lasts 750ms, staggered by 35ms up to 500ms. Portrait hover transitions last 450ms; row background transitions last 180ms. Reduced motion disables animation, transitions, hover transforms, and smooth detail scrolling.
 - **CSV:** `sponsors.example.csv` is bundled at build time; changes require rebuilding. Columns are `profile_picture`, `name`, `social_id`, `amount`, `transaction_id`, and `notes`. Names and nonnegative amounts with up to two decimals are required. Derive INR totals and counts from rows; preserve CSV order. Render values as text and show optional details only when populated.
@@ -67,8 +67,6 @@ Circular portraits are the signature. Contribution rows and sponsor buttons have
 
 The contribution feed uses small avatars and “Name paid ₹amount” sentences, with an @user_id and relative payment time below. Order it newest first using the CSV's UTC `paid_at` field; refresh labels every 30 seconds. Keep handles unique, case-insensitive, and independent of social IDs. Row hover uses a 3px horizontal nudge and warm background; reduced motion disables the nudge. Transaction IDs remain hidden.
 
-- Do preserve the ivory canvas, orange heart, pastel circles, visible focus, and restrained motion.
+- Do preserve the ivory canvas, pink heart, pastel circles, visible focus, and restrained motion.
 - Do synchronize selected details between both entry points.
 - Don't imply example records are verified sponsors or CSV edits automatically update deployed builds.
-
-Palette source: [mohan-bee/yali src/style.css](https://github.com/mohan-bee/yali/blob/main/src/style.css). Preserve Yali’s paper, ink, muted, orange, divider, and focus colors; portrait tints are supporting colors, not contribution categories.
