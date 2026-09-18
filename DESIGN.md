@@ -45,7 +45,7 @@ Use bundled Manrope, with weights 400–700. The total is the strongest type; am
 
 The centered page has a 1280px maximum width and 56px desktop side padding. A 270px summary column and 70px gutter sit beside five sponsor columns. Selected details and the scrollable contribution list appear under the total.
 
-At 1050px, side padding becomes 32px, the summary column 230px, the gutter 38px, and the wall four columns. At 760px, use 24px side padding and one vertical flow: summary, wall, details, contributions. The wall uses three columns, portraits up to 88px (94px on desktop), and a 44px total. The contribution list has a 198px maximum height.
+At 1050px, side padding becomes 32px, the summary column 230px, the gutter 38px, and the wall four columns. At 760px, use 24px side padding and one vertical flow: summary, wall, details, contributions. The wall uses three columns, portraits up to 74px (80px on desktop), and a 44px total. The contribution list has a 198px maximum height.
 
 ## Elevation & Depth
 

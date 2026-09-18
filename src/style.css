@@ -57,7 +57,7 @@ h1 { display: flex; align-items: center; gap: 10px; font-size: 25px; line-height
 .wall-heading p { margin-top: 8px; }
 .sponsor-grid { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 30px 18px; }
 .sponsor { min-width: 0; padding: 0; border: none; background: transparent; border-radius: 10px; text-align: center; animation: arrive 750ms var(--ease) backwards; animation-delay: var(--delay); }
-.sponsor .avatar { width: min(100%, 94px); margin: 0 auto 13px; font-size: 25px; border: 1px solid #392e3314; transition: transform 450ms var(--ease), box-shadow 450ms var(--ease); }
+.sponsor .avatar { width: min(100%, 80px); margin: 0 auto 13px; font-size: 22px; border: 1px solid #392e3314; transition: transform 450ms var(--ease), box-shadow 450ms var(--ease); }
 .sponsor:hover .avatar { transform: translateY(-5px) rotate(-4deg); box-shadow: 0 9px 16px #392e3312; }
 .sponsor[aria-pressed='true'] .avatar { outline: 2px solid #a84664; outline-offset: 4px; }
 .sponsor-name { display: block; font-size: 11px; line-height: 1.4; overflow-wrap: anywhere; }
@@ -83,7 +83,7 @@ footer { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 10
   .wall-heading { margin-bottom: 28px; }
   .wall-heading h2 { font-size: 21px; }
   .sponsor-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 26px 20px; }
-  .sponsor .avatar { width: min(100%, 88px); }
+  .sponsor .avatar { width: min(100%, 74px); }
   .contribution { font-size: 12px; }
 }
 @media (prefers-reduced-motion: reduce) {
