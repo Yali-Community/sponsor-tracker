@@ -9,8 +9,8 @@
     <title>Sponsors</title>
   </head>
   <body>
-    <main>
-      <header>
+    <main class="page">
+      <header class="page-header">
         <h1>
           Sponsors
           <svg class="heart" viewBox="0 0 32 32" aria-hidden="true">
@@ -18,7 +18,13 @@
             <path class="heart-shine" d="M8 11c0-2 2-3 3-2" />
           </svg>
         </h1>
+        <span class="demo-label">Sample sponsors</span>
       </header>
+      <div class="layout" id="sponsors-app">
+        <p role="status">Loading sponsors…</p>
+      </div>
+      <noscript>Enable JavaScript to view the sponsor wall.</noscript>
+      <footer><span>A little support. A lot of possibility.</span><span>Made possible by people.</span></footer>
     </main>
     <script type="module" src="/src/main.ts"></script>
   </body>
