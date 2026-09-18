@@ -53,7 +53,7 @@ Keep surfaces flat with thin dividers. Hovered portraits gain a faint shadow, 5p
 
 ## Shapes
 
-Circular portraits are the signature. Contribution rows and sponsor buttons have softly rounded interaction areas; the Sponsor action pairs a label with three overlapping pastel circles.
+Circular portraits are the signature. Contribution rows and sponsor buttons have softly rounded interaction areas; the Sponsor action pairs a label with up to three overlapping approved sponsor photos, hidden when none are available.
 
 ## Components
 
@@ -63,12 +63,12 @@ Circular portraits are the signature. Contribution rows and sponsor buttons have
 - **Portraits:** valid HTTPS or root-relative photos cover circles; missing or failed photos reveal initials. Decorative images are hidden from assistive technology; buttons announce the sponsor and amount.
 - **Motion:** arrival lasts 750ms, staggered by 35ms up to 500ms. Portrait hover transitions last 450ms; row background transitions last 180ms. Reduced motion disables animation, transitions, hover transforms, and smooth detail scrolling.
 - **Data:** production loads approved entries from the API. The sample CSV is local-development data only. Public fields exclude email and payment references. Empty approved data shows a zero total and a welcoming empty wall.
-- **Sponsor form:** a native modal pairs the supplied QR with labeled fields. Mobile stacks the QR above the form. Preserve input on errors, reuse request IDs for retries, and focus the saved-pending confirmation after success.
+- **Sponsor form:** a native modal pairs a plain QR with labeled fields; submission time is recorded automatically. Mobile stacks the QR above the form. Preserve input on errors, reuse request IDs for retries, and focus the saved-pending confirmation after success.
 - **Admin:** email-link sign-in protects pending requests and CSV export. Review cards expose payment details for manual checking, with approve, reject, and email retry actions. Logout clears private rows and invalidates stale loads.
 
 ## Do's and Don'ts
 
-The contribution feed uses small avatars and “Name paid ₹amount” sentences, with an @user_id and relative payment time below. Order it newest first using the CSV's UTC `paid_at` field; refresh labels every 30 seconds. Keep handles unique, case-insensitive, and independent of social IDs. Row hover uses a 3px horizontal nudge and warm background; reduced motion disables the nudge. Transaction IDs remain hidden.
+The contribution feed uses small avatars and “Name paid ₹amount” sentences, with an @user_id and relative submission time below. Order it newest first using the CSV's UTC `paid_at` field; refresh labels every 30 seconds. Keep handles unique, case-insensitive, and independent of social IDs. Row hover uses a 3px horizontal nudge and warm background; reduced motion disables the nudge. Transaction IDs remain hidden.
 
 - Do preserve the ivory canvas, pink heart, pastel circles, visible focus, and restrained motion.
 - Do synchronize selected details between both entry points.

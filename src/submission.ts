@@ -14,11 +14,6 @@ document.querySelector('#sponsor-button')!.addEventListener('click', () => {
     form.hidden = false
     success.hidden = true
   }
-  const date = form.elements.namedItem('paid_at') as HTMLInputElement
-  if (!date.value) {
-    const local = new Date(Date.now() - new Date().getTimezoneOffset() * 60000)
-    date.value = local.toISOString().slice(0, 16)
-  }
   message.textContent = ''
   dialog.showModal()
 })
@@ -50,7 +45,6 @@ form.addEventListener('submit', async event => {
       request_id: requestId,
       user_id: data.get('user_id'), name: data.get('name'), email: data.get('email'),
       social_id: data.get('social_id'), amount: data.get('amount'),
-      paid_at: new Date(String(data.get('paid_at'))).toISOString(),
       transaction_id: data.get('transaction_id'), notes: data.get('notes'),
       consent: data.get('consent') === 'on', website: data.get('website'), photo: photoData,
     }

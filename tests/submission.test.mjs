@@ -11,7 +11,7 @@ process.env.VERCEL_GIT_COMMIT_REF = 'test-branch'
 const valid = {
   request_id: '6c5b2c57-4d40-4b78-86f7-baf6d3f8c123',
   user_id: 'Ada.Lee', name: 'Ada Lee', email: 'ada@example.com', social_id: '',
-  amount: '500', paid_at: '2026-09-18T05:40:00.000Z', transaction_id: 'TEST-REFERENCE',
+  amount: '500', transaction_id: 'TEST-REFERENCE',
   notes: 'Thank you!', consent: true, website: '',
 }
 const now = Date.parse('2026-09-18T06:00:00Z')
@@ -20,13 +20,14 @@ test('validates and normalizes a complete sponsorship request', () => {
   assert.equal(result.user_id, 'ada.lee')
   assert.equal(result.photo, undefined)
   assert.equal(result.email, valid.email)
+  assert.equal(result.paid_at, new Date(now).toISOString())
+  assert.equal(validateSubmission({ ...valid, paid_at: '2000-01-01' }, now).paid_at, result.paid_at)
 })
-test('rejects missing consent, invalid amounts/dates/email/handles, and spam honeypot', () => {
+test('rejects missing consent, invalid amounts/email/handles, and spam honeypot', () => {
   for (const patch of [
     { consent: false }, { amount: '0' }, { amount: '-1' }, { amount: '1e3' }, { amount: '1000001' },
     { email: 'bad@example.com\nBcc: victim@example.com' }, { user_id: '../admin' },
-    { paid_at: '2026-02-30T00:00:00.000Z' }, { paid_at: '2026-09-19T00:00:00.000Z' },
-    { paid_at: '2026-09-18' }, { name: '' }, { transaction_id: '' }, { notes: 'x'.repeat(501) },
+    { name: '' }, { transaction_id: '' }, { notes: 'x'.repeat(501) },
     { request_id: '../file' }, { website: 'spam.example' },
   ]) assert.throws(() => validateSubmission({ ...valid, ...patch }, now))
 })
@@ -55,9 +56,10 @@ test('mutations require same-origin requests', () => {
   assert.throws(() => checkOrigin('http://sponsors.example.com', 'sponsors.example.com'))
 })
 test('public projection excludes private fields and export neutralizes spreadsheet formulas', () => {
-  const record = { ...valid, photo_path: 'private/photo.jpg', photo_type: 'image/jpeg', status: 'approved',
-    submitted_at: valid.paid_at, reviewed_at: valid.paid_at, pending_email: 'sent', decision_email: 'sent' }
+  const record = { ...valid, paid_at: '2026-09-17T12:00:00.000Z', photo_path: 'private/photo.jpg', photo_type: 'image/jpeg', status: 'approved',
+    submitted_at: new Date(now).toISOString(), reviewed_at: new Date(now).toISOString(), pending_email: 'sent', decision_email: 'sent' }
   const publicData = publicRecord(record)
+  assert.equal(publicData.paid_at, record.submitted_at)
   assert.equal(publicData.email, undefined)
   assert.equal(publicData.transaction_id, '')
   assert.equal(publicData.photo_path, undefined)

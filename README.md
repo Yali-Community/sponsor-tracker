@@ -5,8 +5,8 @@ A TypeScript + Vite sponsor wall with a QR payment form and private admin review
 ## How it works
 
 1. Click **Sponsor**, scan the supplied UPI QR, and pay using your own UPI app.
-2. Enter your name, unique user ID, email, amount, payment time, and transaction reference. Social ID, profile photo, and note are optional.
-3. Submit for review. The request is saved as **pending** and a confirmation email is sent.
+2. Enter your name, unique user ID, email, amount, and transaction reference. Social ID, profile photo, and note are optional.
+3. Submit for review. The server records the submission time automatically. The request is saved as **pending** and a confirmation email is sent.
 4. Open **/admin.html**, request an email sign-in link, and review the payment against your UPI account. Approve to publish or reject to keep it hidden. The contributor receives a status email.
 5. The public page fetches approved entries on each page load. No rebuild is needed after approval.
 
@@ -16,9 +16,9 @@ The form does **not** verify or initiate payments. Admin approval is manual. One
 
 The live `admin.csv` is in a **private Vercel Blob store**, not GitHub or the public assets folder. It tracks pending/approved/rejected status, email delivery, and review timestamps. Admins can download it from the authenticated admin page. `data/admin.example.csv` contains only the column headers.
 
-Email addresses, transaction IDs, pending records, and pending photos are never returned by the public API. A profile photo is served through the API only after approval or to a signed-in admin. Names, handles, amounts, payment times, social IDs, photos and notes are published with the contributor's consent.
+Email addresses, transaction IDs, pending records, and pending photos are never returned by the public API. A profile photo is served through the API only after approval or to a signed-in admin. Names, handles, amounts, submission times, social IDs, photos and notes are published with the contributor's consent.
 
-The supplied QR image and Yali logo are committed in `public/`. Uploaded profile photos stay in private Blob storage, with approved images served through the API; they are not committed to the public GitHub repo.
+The clean QR (with the original payment payload) and Yali logo are committed in `public/`. Uploaded profile photos stay in private Blob storage, with approved images served through the API; they are not committed to the public GitHub repo.
 
 CSV writes use conditional ETags and retries to avoid losing concurrent submissions. Email delivery uses an atomic claim to prevent normal concurrent duplicate sends. Admins can retry failed emails; an abandoned claim expires after two minutes. SMTP delivery and storage are separate services, so an uncertain SMTP result may still lead to a duplicate email on retry.
 
@@ -50,7 +50,7 @@ npm run build
 
 `npm run dev` shows the fictional `sponsors.example.csv` data for UI development. It does not run Vercel Functions. Test submissions, admin authentication, and real storage on a Vercel preview (or use `vercel dev` with server environment variables). `npm run preview` previews only the static build.
 
-The sample CSV supports quoted values, multiline notes, unique lowercase handles, and UTC payment timestamps. Live submissions use server validation and their private review CSV. The sample data and private transaction references are not included in the production sponsor feed.
+The sample CSV supports quoted values, multiline notes, unique lowercase handles, and UTC submission timestamps. Live submissions use server validation and their private review CSV; the existing `paid_at` column stores the server-recorded submission time for new requests. The sample data and private transaction references are not included in the production sponsor feed.
 
 ## Deploy
 

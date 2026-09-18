@@ -120,19 +120,14 @@ button:disabled { cursor: wait; opacity: 0.6; }
 .sponsor-cta { display: inline-flex; align-items: center; gap: 24px; padding: 10px 16px; border: 1px solid var(--line); border-radius: 8px; background: transparent; font-size: 13px; font-weight: 600; transition: background 180ms, border-color 180ms; }
 .sponsor-cta:hover { background: #f4ece9; border-color: #a84664; }
 .cta-circles { display: flex; padding-left: 10px; }
-.cta-circles i { width: 26px; height: 26px; border: 2px solid #392e33; border-radius: 50%; margin-left: -10px; background: #aeddf1; }
-.cta-circles i:nth-child(2) { background: #f9e8aa; }
-.cta-circles i:nth-child(3) { background: #bfe9ca; }
+.cta-circles img { width: 28px; height: 28px; object-fit: cover; border: 2px solid #fffaf7; border-radius: 50%; margin-left: -10px; }
 dialog { width: min(940px, calc(100% - 32px)); max-height: calc(100dvh - 32px); padding: 48px 32px 32px; color: #392e33; background: #fffaf7; border: 1px solid var(--line); border-radius: 16px; box-shadow: 0 24px 80px #392e3329; overflow-y: auto; }
 dialog::backdrop { background: #241b2280; }
 dialog[open] { animation: arrive 250ms var(--ease); }
 .dialog-close { position: absolute; top: 10px; right: 14px; }
 .donation-layout { display: grid; grid-template-columns: 260px minmax(0, 1fr); gap: 36px; }
-.payment-panel h2 { font-size: 26px; font-weight: 600; letter-spacing: -0.035em; line-height: 1.3; }
-.payment-panel [lang=ta] { font-size: 11px; margin-top: 14px; color: var(--muted); }
-.payment-qr { display: block; width: 100%; height: auto; margin-block: 20px 12px; border-radius: 12px; }
-.payment-instructions, .upi-id { font-size: 12px; line-height: 1.7; overflow-wrap: anywhere; }
-.upi-id { font-weight: 600; margin-top: 6px; }
+.payment-panel { align-self: start; }
+.payment-qr { display: block; width: 100%; height: auto; background: #fff; }
 .submission-panel h3 { font-size: 21px; }
 .form-intro { color: var(--muted); font-size: 12px; line-height: 1.7; margin: 8px 0 24px; }
 .form-fields { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }

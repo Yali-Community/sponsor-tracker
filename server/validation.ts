@@ -30,11 +30,7 @@ export function validateSubmission(input: Record<string, unknown>, now = Date.no
   if (!/^[^\s@<>]+@[^\s@<>]+\.[^\s@<>]+$/.test(email)) throw new HttpError(400, 'Enter a valid email address.')
   const amount = text('amount', 12)
   if (!/^\d+(\.\d{1,2})?$/.test(amount) || Number(amount) <= 0 || Number(amount) > 1000000) throw new HttpError(400, 'Enter an amount between ₹0.01 and ₹10,00,000.')
-  const paid_at = text('paid_at', 30)
-  const timestamp = Date.parse(paid_at)
-  if (!/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.000Z$/.test(paid_at) ||
-    !Number.isFinite(timestamp) || new Date(timestamp).toISOString() !== paid_at ||
-    timestamp < Date.UTC(2020, 0, 1) || timestamp > now + 300000) throw new HttpError(400, 'Enter the date and time you completed the payment.')
+  const paid_at = new Date(now).toISOString()
   const transaction_id = text('transaction_id', 100)
   if (/[\r\n]/.test(transaction_id)) throw new HttpError(400, 'Enter a valid payment reference.')
   if (input.consent !== true) throw new HttpError(400, 'Please agree to publish your sponsor details after approval.')

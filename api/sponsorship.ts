@@ -93,7 +93,7 @@ export default async function handler(req: Request, res: ServerResponse) {
           email: submission.email, social_id: submission.social_id, amount: submission.amount,
           paid_at: submission.paid_at, transaction_id: submission.transaction_id, notes: submission.notes,
           photo_path: photoPath, photo_type: submission.photo?.type || '', status: 'pending',
-          submitted_at: new Date().toISOString(), reviewed_at: '', pending_email: '', decision_email: '',
+          submitted_at: submission.paid_at, reviewed_at: '', pending_email: '', decision_email: '',
         }
         await updateRecords(records => {
           if (records.some(item => item.user_id === record.user_id)) throw new HttpError(409, 'This user ID is already in use. Choose another.')

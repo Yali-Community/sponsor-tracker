@@ -47,6 +47,21 @@ try {
     sponsors = await response.json()
   }
   const total = totalAmount(sponsors)
+  const photos = sponsors.filter(sponsor => profileUrl(sponsor.profile_picture)).slice(0, 3)
+  const sponsorPhotos = document.querySelector<HTMLElement>('#sponsor-photos')!
+  photos.forEach(sponsor => {
+    const image = document.createElement('img')
+    image.alt = ''
+    image.hidden = true
+    image.referrerPolicy = 'no-referrer'
+    image.addEventListener('load', () => { image.hidden = false; sponsorPhotos.hidden = false }, { once: true })
+    image.addEventListener('error', () => {
+      image.remove()
+      sponsorPhotos.hidden = !sponsorPhotos.querySelector('img:not([hidden])')
+    }, { once: true })
+    image.src = profileUrl(sponsor.profile_picture)!
+    sponsorPhotos.append(image)
+  })
   app.replaceChildren()
   const summary = element('section', 'summary')
   summary.setAttribute('aria-label', 'Sponsorship summary')
@@ -54,7 +69,7 @@ try {
   summary.append(element('p', 'summary-copy', 'Small gestures. Shared momentum.'))
   const supporterCount = element('div', 'supporter-count')
   const stack = element('span', 'avatar-stack')
-  sponsors.slice(0, 3).forEach((sponsor, index) => stack.append(avatar(sponsor, index)))
+  photos.forEach((sponsor, index) => stack.append(avatar(sponsor, index)))
   supporterCount.append(stack, element('span', '', `${sponsors.length} ${sponsors.length === 1 ? 'sponsor' : 'sponsors'}`))
   summary.append(supporterCount)
   const selected = element('section', 'selected')
@@ -117,7 +132,7 @@ try {
     const time = element('time', 'payment-time', relativePaymentTime(sponsor.paid_at))
     time.dateTime = sponsor.paid_at
     time.title = new Date(sponsor.paid_at).toLocaleString()
-    meta.append(element('span', 'user-id', `@${sponsor.user_id}`), document.createTextNode(' · '), time)
+    meta.append(element('span', 'user-id', `@${sponsor.user_id}`), document.createTextNode(' · submitted '), time)
     activity.append(sentence, meta)
     rowButton.append(avatar(sponsor, index), activity)
     rowButton.addEventListener('click', () => select(index, true))

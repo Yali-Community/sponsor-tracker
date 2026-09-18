@@ -4,7 +4,7 @@ import './style.css'
 
 interface Review {
   request_id: string; name: string; user_id: string; email: string; social_id: string
-  amount: string; paid_at: string; transaction_id: string; notes: string; photo_path: string
+  amount: string; submitted_at: string; transaction_id: string; notes: string; photo_path: string
   status: 'pending' | 'approved' | 'rejected'; pending_email: string; decision_email: string
 }
 const status = document.querySelector<HTMLParagraphElement>('#admin-message')!
@@ -64,7 +64,7 @@ function render() {
     const details = node('dl', '', 'review-details')
     for (const [label, value] of [
       ['User ID', '@' + record.user_id], ['Email', record.email], ['Social ID', record.social_id || '—'],
-      ['Paid at', new Date(record.paid_at).toLocaleString()], ['Payment reference', record.transaction_id],
+      ['Submitted at', new Date(record.submitted_at).toLocaleString()], ['Payment reference', record.transaction_id],
       ['Note', record.notes || '—'], ['Request', record.request_id],
       ['Email delivery', record.status === 'pending' ? record.pending_email || 'waiting' : record.decision_email || 'waiting'],
     ]) details.append(node('dt', label), node('dd', value))

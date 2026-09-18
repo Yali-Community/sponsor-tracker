@@ -71,7 +71,7 @@ export async function limit(key: string, seconds: number) {
 export function publicRecord(record: ReviewRecord) {
   return {
     user_id: record.user_id, name: record.name, social_id: record.social_id,
-    amount: Number(record.amount), paid_at: record.paid_at, notes: record.notes,
+    amount: Number(record.amount), paid_at: record.submitted_at, notes: record.notes,
     profile_picture: record.photo_path ? `/api/sponsorship?action=photo&id=${record.request_id}` : '',
     transaction_id: '',
   }
