@@ -5,7 +5,7 @@ import './style.css'
 interface Review {
   request_id: string; name: string; user_id: string; email: string; social_id: string
   amount: string; submitted_at: string; transaction_id: string; notes: string; photo_path: string
-  status: 'pending' | 'approved' | 'rejected'; pending_email: string; decision_email: string
+  status: 'pending' | 'approved' | 'rejected' | 'revoked'; pending_email: string; decision_email: string
   returning_user_verified?: string
 }
 const status = document.querySelector<HTMLParagraphElement>('#admin-message')!
@@ -97,6 +97,7 @@ function render() {
     article.append(reference)
     const actions = node('div', '', 'review-actions')
     async function act(action: string, decision?: string) {
+      if (decision === 'revoked' && !window.confirm(`Revoke this ₹${record.amount} contribution from @${record.user_id}? It will be removed from the public wall and total. This does not issue a refund.`)) return
       const buttons = [...actions.querySelectorAll('button')]
       buttons.forEach(button => button.disabled = true)
       status.textContent = 'Saving…'
@@ -116,6 +117,12 @@ function render() {
         button.addEventListener('click', () => void act('review', decision))
         actions.append(button)
       }
+    }
+    if (record.status === 'approved') {
+      const revoke = document.createElement('button')
+      revoke.textContent = 'Revoke approval'; revoke.className = 'quiet-button danger-button'
+      revoke.addEventListener('click', () => void act('review', 'revoked'))
+      actions.append(revoke)
     }
     const emailStatus = record.status === 'pending' ? record.pending_email : record.decision_email
     if (emailStatus !== 'sent') {

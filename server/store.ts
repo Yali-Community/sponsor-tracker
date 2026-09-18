@@ -15,7 +15,7 @@ export interface ReviewRecord {
   notes: string
   photo_path: string
   photo_type: string
-  status: 'pending' | 'approved' | 'rejected'
+  status: 'pending' | 'approved' | 'rejected' | 'revoked'
   submitted_at: string
   reviewed_at: string
   pending_email: string
@@ -31,7 +31,8 @@ function conflict(error: unknown) {
 }
 export async function readRecords() {
   if (!process.env.BLOB_READ_WRITE_TOKEN) throw new HttpError(503, 'Sponsorship submissions are not configured yet.')
-  const blob = await get(`${namespace()}/admin.csv`, { access: 'private', useCache: false })
+  // Compressed responses can carry weak ETags, which cannot be used for conditional writes.
+  const blob = await get(`${namespace()}/admin.csv`, { access: 'private', useCache: false, headers: { 'Accept-Encoding': 'identity' } })
   if (!blob) return { records: [] as ReviewRecord[], etag: undefined }
   if (blob.statusCode !== 200) throw new Error('Unexpected storage response')
   const csv = await new Response(blob.stream).text()

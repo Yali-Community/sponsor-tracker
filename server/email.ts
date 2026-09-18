@@ -17,6 +17,8 @@ export async function sendStatus(record: ReviewRecord) {
     ? 'Your sponsorship request is under review. It will appear on the sponsor wall after we verify your payment and approve your entry.'
     : record.status === 'approved'
       ? 'Your sponsorship has been approved and is now on the sponsor wall. Thank you for supporting Yali!'
+      : record.status === 'revoked'
+        ? 'Approval for this contribution has been revoked. It has been removed from the public sponsor wall and total. Your other approved contributions are unaffected. This does not issue a refund. Please reply to this email if you have questions.'
       : 'We could not approve your sponsorship request. Please reply to this email so we can help check your payment details. This does not mean a payment was refunded.'
   await sendEmail(record.email, `Yali sponsorship: ${record.status === 'pending' ? 'under review' : record.status}`,
     `Hello ${record.name},\n\n${description}\n\nAmount: INR ${record.amount}\nUser ID: @${record.user_id}\nRequest: ${record.request_id}\n\nஉங்கள் ஆதரவு, எங்கள் வலிமை.\nYali\n`)

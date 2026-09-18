@@ -7,7 +7,8 @@ import { createSponsorChallenge, confirmSponsorCode, requireSponsorVerification 
 import { checkSubmissionLimit } from '../server/submission-limit.ts'
 import { checkOrigin, requireAdmin, adminSession, signToken, verifyToken, namespace, hash } from '../server/security.ts'
 import { sendEmail } from '../server/email.ts'
-import { notify, deliveryInProgress } from '../server/notifications.ts'
+import { notify } from '../server/notifications.ts'
+import { reviewRequest } from '../server/review.ts'
 
 type Request = IncomingMessage & { body?: unknown }
 function json(res: ServerResponse, status: number, value: unknown) {
@@ -152,16 +153,11 @@ export default async function handler(req: Request, res: ServerResponse) {
     }
     requireAdmin(req.headers.cookie)
     if (action === 'review') {
-      if (typeof input.request_id !== 'string' || !['approved', 'rejected'].includes(String(input.status))) throw new HttpError(400, 'Choose approve or reject.')
+      if (typeof input.request_id !== 'string' || !['approved', 'rejected', 'revoked'].includes(String(input.status))) throw new HttpError(400, 'Choose approve, reject or revoke.')
       const record = await updateRecords(records => {
         const record = records.find(item => item.request_id === input.request_id)
         if (!record) throw new HttpError(404, 'Request not found.')
-        if (record.status !== 'pending' && record.status !== input.status) throw new HttpError(409, 'This request has already been reviewed.')
-        if (record.status === 'pending') {
-          if (deliveryInProgress(record.pending_email)) throw new HttpError(409, 'The pending email is being sent. Please retry approval in a moment.')
-          record.status = input.status as 'approved' | 'rejected'
-          record.reviewed_at = new Date().toISOString()
-        }
+        reviewRequest(record, input.status as 'approved' | 'rejected' | 'revoked')
         return { ...record }
       })
       const emailSent = await notify(record, 'decision_email')
