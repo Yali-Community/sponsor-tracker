@@ -124,7 +124,9 @@ button:disabled { cursor: wait; opacity: 0.6; }
 dialog { width: min(940px, calc(100% - 32px)); max-height: calc(100dvh - 32px); padding: 48px 32px 32px; color: #392e33; background: #fffaf7; border: 1px solid var(--line); border-radius: 16px; box-shadow: 0 24px 80px #392e3329; overflow-y: auto; }
 dialog::backdrop { background: #241b2280; }
 dialog[open] { animation: arrive 250ms var(--ease); }
-.dialog-close { position: absolute; top: 10px; right: 14px; }
+.dialog-close { position: absolute; top: 10px; right: 14px; width: 44px; height: 44px; padding: 0; }
+.lucide { flex-shrink: 0; }
+.icon-label, .primary-button, .quiet-button { display: inline-flex; align-items: center; justify-content: center; gap: 8px; }
 .donation-layout { display: grid; grid-template-columns: 260px minmax(0, 1fr); gap: 36px; }
 .payment-panel { align-self: start; }
 .payment-qr { display: block; width: 100%; height: auto; background: #fff; }
