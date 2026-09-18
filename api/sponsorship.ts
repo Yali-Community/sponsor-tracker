@@ -1,5 +1,5 @@
 import type { IncomingMessage, ServerResponse } from 'node:http'
-import { randomInt } from 'node:crypto'
+import { randomInt, randomUUID } from 'node:crypto'
 import { get, put, del } from '@vercel/blob'
 import { validateSubmission, HttpError } from '../server/validation.ts'
 import { readRecords, updateRecords, claimOnce, limit, csvFor, publicRecord, publicSponsors, type ReviewRecord } from '../server/store.ts'
@@ -9,6 +9,7 @@ import { checkOrigin, requireAdmin, adminSession, signToken, verifyToken, namesp
 import { sendEmail } from '../server/email.ts'
 import { notify } from '../server/notifications.ts'
 import { reviewRequest } from '../server/review.ts'
+import { adminUsers, editUser, editContribution, contributionVersion } from '../server/users.ts'
 
 type Request = IncomingMessage & { body?: unknown }
 function json(res: ServerResponse, status: number, value: unknown) {
@@ -50,7 +51,8 @@ export default async function handler(req: Request, res: ServerResponse) {
         res.setHeader('Content-Disposition', 'attachment; filename="sponsor-admin.csv"')
         return res.end('\uFEFF' + csvFor(records, true))
       }
-      if (action === 'admin') return json(res, 200, records)
+      if (action === 'admin') return json(res, 200, records.map(record => ({ ...record, version: contributionVersion(record) })))
+      if (action === 'users') return json(res, 200, adminUsers(records))
       throw new HttpError(404, 'Not found.')
     }
     if (req.method !== 'POST') { res.setHeader('Allow', 'GET, POST'); throw new HttpError(405, 'Method not allowed.') }
@@ -70,7 +72,7 @@ export default async function handler(req: Request, res: ServerResponse) {
       await limit(`sponsor-code-user:${userId}`, 60)
       const code = String(randomInt(100000, 1000000))
       await sendEmail(account.email, 'Your Yali sponsorship verification code', `Your verification code is ${code}.\n\nUse it within 10 minutes to submit another contribution under @${userId}. Never share this code. If you did not request it, ignore this email.\n\nYali`)
-      return json(res, 200, { challenge: createSponsorChallenge(userId, requestId, code) })
+      return json(res, 200, { challenge: createSponsorChallenge(userId, requestId, code, account.email) })
     }
     if (action === 'verify-sponsor-code') {
       const challenge = typeof input.challenge === 'string' ? input.challenge : ''
@@ -109,11 +111,11 @@ export default async function handler(req: Request, res: ServerResponse) {
       const existing = current.find(item => item.request_id === input.request_id)
       if (existing) {
         if (existing.user_id !== userId) throw new HttpError(409, 'Please reload the form.')
-        if (typeof input.email !== 'string' || existing.email !== input.email.trim().toLowerCase()) requireSponsorVerification(input.verification, userId, input.request_id)
+        if (typeof input.email !== 'string' || existing.email !== input.email.trim().toLowerCase()) requireSponsorVerification(input.verification, userId, input.request_id, existing.email)
         return json(res, 200, { request_id: existing.request_id, status: existing.status, emailSent: existing.pending_email === 'sent' })
       }
       const account = current.find(record => record.user_id.toLowerCase() === userId)
-      if (account) requireSponsorVerification(input.verification, userId, input.request_id)
+      if (account) requireSponsorVerification(input.verification, userId, input.request_id, account.email)
       const submission = validateSubmission(account ? { ...input, name: account.name, email: account.email, social_id: account.social_id, photo: '' } : input)
       let photoPath = ''
       let saved = false
@@ -133,7 +135,12 @@ export default async function handler(req: Request, res: ServerResponse) {
           returning_user_verified: account ? 'yes' : '',
         }
         await updateRecords(records => {
-          if (records.some(item => item.user_id.toLowerCase() === record.user_id)) requireSponsorVerification(input.verification, record.user_id, record.request_id)
+          const latestAccount = records.find(item => item.user_id.toLowerCase() === record.user_id)
+          if (account && !latestAccount) throw new HttpError(409, 'Your profile changed. Reload the form and verify again.')
+          if (latestAccount) {
+            requireSponsorVerification(input.verification, record.user_id, record.request_id, latestAccount.email)
+            for (const key of ['name', 'email', 'social_id', 'photo_path', 'photo_type'] as const) record[key] = latestAccount[key]
+          }
           if (records.some(item => item.transaction_id.toLowerCase() === record.transaction_id.toLowerCase())) throw new HttpError(409, 'This payment reference has already been submitted.')
           checkSubmissionLimit(records, record.email)
           records.push(record)
@@ -152,6 +159,29 @@ export default async function handler(req: Request, res: ServerResponse) {
       }
     }
     requireAdmin(req.headers.cookie)
+    if (action === 'edit-user') {
+      let photoPath = ''
+      try {
+        const validated = editUser((await readRecords()).records, input)
+        if (validated.photo) {
+          const photo = await put(`${namespace()}/photos/${randomUUID()}.${validated.photo.extension}`, validated.photo.bytes, {
+            access: 'private', addRandomSuffix: false, allowOverwrite: false, contentType: validated.photo.type,
+          })
+          photoPath = photo.pathname
+        }
+        await updateRecords(records => editUser(records, input, photoPath))
+        return json(res, 200, { ok: true })
+      } finally {
+        if (photoPath) {
+          try { if (!(await readRecords()).records.some(item => item.photo_path === photoPath)) await del(photoPath) }
+          catch { /* Retain a possibly committed photo if persistence cannot be confirmed. */ }
+        }
+      }
+    }
+    if (action === 'edit-contribution') {
+      await updateRecords(records => editContribution(records, input))
+      return json(res, 200, { ok: true })
+    }
     if (action === 'review') {
       if (typeof input.request_id !== 'string' || !['approved', 'rejected', 'revoked'].includes(String(input.status))) throw new HttpError(400, 'Choose approve, reject or revoke.')
       const record = await updateRecords(records => {
