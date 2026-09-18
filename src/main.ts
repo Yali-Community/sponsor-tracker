@@ -76,11 +76,6 @@ try {
     heading.append(avatar(sponsor, index), identity)
     selected.append(heading, element('p', 'selected-amount', `${formatAmount(sponsor.amount)} contributed`))
     if (sponsor.notes) selected.append(element('p', 'notes', sponsor.notes))
-    if (sponsor.transaction_id) {
-      const reference = element('p', 'transaction')
-      reference.append(element('span', '', 'Transaction ID'), element('span', '', sponsor.transaction_id))
-      selected.append(reference)
-    }
     if (reveal && window.matchMedia('(max-width: 760px)').matches) {
       selected.scrollIntoView({
         behavior: window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 'instant' : 'smooth',

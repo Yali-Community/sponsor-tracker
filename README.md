@@ -1,6 +1,6 @@
 # Sponsor tracker
 
-A minimal TypeScript and Vite sponsor wall with a pink heart, pastel avatars, and a total calculated from CSV.
+A minimal TypeScript and Vite sponsor wall with an orange heart, warm-toned avatars, and a total calculated from CSV.
 
 ## Sponsor data
 
@@ -13,7 +13,7 @@ Edit `sponsors.example.csv` in the repository root. The page imports it at build
 - `transaction_id`: plain text reference.
 - `notes`: optional text. Quote values that contain commas, quotes, or line breaks using normal CSV escaping.
 
-Select an avatar or contribution to see the sponsor's details. The shipped sample label is in `index.html`; update it when replacing the sample data. All six fields are included in the public site, so only add data intended for public display.
+Select an avatar or contribution to see the sponsor's details. The shipped sample label is in `index.html`; update it when replacing the sample data. Transaction IDs are retained in the CSV but are not displayed in the UI. The CSV is bundled into the public site, so this is not a privacy boundary.
 
 The page supports keyboard selection, image fallbacks, empty/error states, and reduced-motion preferences.
 
@@ -42,3 +42,7 @@ Run `npm test` for CSV parsing, amount validation, total calculation, and profil
 Import this repository into Vercel with the repository root as the root directory.
 The included `vercel.json` selects Vite, runs `npm run build`, and publishes `dist/`.
 No environment variables are required.
+
+## Color theme
+
+Colors follow [mohan-bee/yali](https://github.com/mohan-bee/yali/blob/main/src/style.css): paper `#faf7ef`, ink `#20211c`, muted `#626155`, orange `#f58612`, and dividers `#d8d4c8`. Focus uses Yali’s burnt orange `#9c4200`; avatar backgrounds are soft tints that complement this palette.
