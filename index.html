@@ -45,9 +45,9 @@
             <h3 id="sponsor-dialog-title">Your sponsorship</h3>
             <p class="form-intro">Scan to pay, then send your details for review.</p>
             <div class="form-fields">
-              <label class="full-width">User ID<input name="user_id" placeholder="john.doe" pattern="[a-zA-Z0-9._]{1,30}" maxlength="30" autocomplete="username" aria-describedby="user-id-status" required /><small id="user-id-status" role="status">Letters, numbers, dots or underscores.</small></label>
+              <label class="full-width">Username<input name="user_id" placeholder="john.doe" pattern="[a-zA-Z0-9._]{1,30}" maxlength="30" autocomplete="username" aria-describedby="user-id-status" required /><small id="user-id-status" role="status">Letters, numbers, dots or underscores.</small></label>
               <div id="existing-user-warning" class="existing-user-warning full-width" hidden>
-                <p class="warning-title"><span data-icon="warning"></span>User ID already exists</p>
+                <p class="warning-title"><span data-icon="warning"></span>Username already exists</p>
                 <p id="existing-user-copy"></p>
                 <div class="verification-actions">
                   <button type="button" id="send-sponsor-code" class="quiet-button"><span data-icon="mail"></span>Send verification code</button>
@@ -64,7 +64,7 @@
               <label class="full-width">Note <span>(optional)</span><textarea name="notes" rows="2" maxlength="500" placeholder="A few words of support…"></textarea></label>
             </div>
             <label class="honeypot" aria-hidden="true">Website<input name="website" tabindex="-1" autocomplete="off" /></label>
-            <label class="consent"><input name="consent" type="checkbox" required /><span>I agree to publish my name, user ID, social ID, photo, amount, submission time and note after approval. My email and payment reference stay private.</span></label>
+            <label class="consent"><input name="consent" type="checkbox" required /><span>I agree to publish my name, username, social ID, photo, amount, submission time and note after approval. My email and payment reference stay private.</span></label>
             <p id="form-message" class="form-message" role="alert"></p>
             <button type="submit" class="primary-button">Send for review</button>
           </form>

@@ -61,7 +61,7 @@ function render() {
   if (!filtered.length) {
     const empty = node('div', '', 'review-empty')
     empty.append(node('h3', query ? 'No matching requests' : activeStatus === 'pending' ? 'You’re all caught up.' : `No ${activeStatus} requests yet.`),
-      node('p', query ? 'Try another name, user ID or payment reference.' : 'New submissions will appear in Pending, ready for your review.'))
+      node('p', query ? 'Try another name, username or payment reference.' : 'New submissions will appear in Pending, ready for your review.'))
     list.append(empty)
   }
   for (const record of filtered) {
@@ -82,7 +82,7 @@ function render() {
     heading.append(identity, amount)
     article.append(heading)
     if (records.some(other => other.request_id !== record.request_id && other.user_id === record.user_id)) {
-      article.append(node('p', `Existing user ID · ${record.returning_user_verified === 'yes' ? 'Saved email verified for this contribution.' : 'Another request uses this ID.'} Verify this payment before approving. Approval adds this amount to the existing profile.`, 'review-repeat'))
+      article.append(node('p', `Existing username · ${record.returning_user_verified === 'yes' ? 'Saved email verified for this contribution.' : 'Another request uses this username.'} Verify this payment before approving. Approval adds this amount to the existing profile.`, 'review-repeat'))
     }
     const details = node('dl', '', 'review-details')
     for (const [label, value] of [

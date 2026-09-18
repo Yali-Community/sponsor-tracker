@@ -16,6 +16,6 @@ export function confirmSponsorCode(challenge: string, code: string) {
 export function requireSponsorVerification(token: unknown, userId: string, requestId: unknown) {
   const data = typeof token === 'string' ? verifyToken(token, 'sponsor-verified') : null
   if (!data || data.user_id !== userId || data.request_id !== requestId) {
-    throw new HttpError(409, 'This user ID already exists. Verify its saved email to sponsor again.', 'USER_ID_EXISTS')
+    throw new HttpError(409, 'This username already exists. Verify its saved email to sponsor again.', 'USER_ID_EXISTS')
   }
 }
