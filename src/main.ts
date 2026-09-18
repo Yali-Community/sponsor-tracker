@@ -50,6 +50,7 @@ try {
     sponsors = data.sponsors
     entries = data.contributions
   }
+  sponsors = [...sponsors].sort((a, b) => b.amount - a.amount || a.user_id.localeCompare(b.user_id))
   const total = totalAmount(sponsors)
   const photos = sponsors.filter(sponsor => profileUrl(sponsor.profile_picture)).slice(0, 3)
   const sponsorPhotos = document.querySelector<HTMLElement>('#sponsor-photos')!
