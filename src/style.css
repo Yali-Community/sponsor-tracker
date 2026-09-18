@@ -141,6 +141,10 @@ input::placeholder, textarea::placeholder { color: #77666d; }
 input:focus-visible, textarea:focus-visible, select:focus-visible, a:focus-visible { outline: 2px solid #a84664; outline-offset: 3px; }
 textarea { resize: vertical; }
 .form-fields small { color: var(--muted); font-size: 10px; font-weight: 400; line-height: 1.6; }
+.form-fields [data-id-state=available] input { border-color: #398151; background: #f2faf4; }
+.form-fields [data-id-state=available] small { color: #27633d; }
+.form-fields [data-id-state=taken] input { border-color: #b65360; background: #fff3f3; }
+.form-fields [data-id-state=taken] small { color: #913440; }
 .existing-user-warning { padding: 16px; border: 1px solid #dfa7ab; border-radius: 8px; background: #fff0ef; color: #852e39; font-size: 12px; line-height: 1.7; }
 .warning-title { display: flex; align-items: center; gap: 8px; font-weight: 700; margin-bottom: 6px; }
 .verification-actions { display: flex; flex-wrap: wrap; gap: 12px; margin-top: 14px; }

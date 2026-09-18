@@ -24,12 +24,16 @@ function profileFields(hidden: boolean) {
 }
 let checkVersion = 0
 let checkTimer: ReturnType<typeof setTimeout>
+function setUserStatus(text: string, state = 'neutral') {
+  userStatus.textContent = text
+  userId.closest('label')!.dataset.idState = state
+}
 function showExisting() {
   warning.hidden = false
   returning = true
   profileFields(true)
   document.querySelector('#existing-user-copy')!.textContent = `@${userId.value.trim().toLowerCase()} is already registered. Verify the email saved for this ID to sponsor again. We’ll reuse the saved name, email and profile photo.`
-  userStatus.textContent = verification ? 'Email verified. Ready for your next contribution.' : 'Existing ID — email verification required.'
+  setUserStatus(verification ? 'Email verified. Ready for your next contribution.' : 'User ID already exists — verify your email to continue.', verification ? 'available' : 'taken')
 }
 function resetUserCheck() {
   checkVersion++
@@ -43,23 +47,23 @@ function resetUserCheck() {
   sendCode.hidden = false
   verificationMessage.textContent = ''
   profileFields(false)
-  userStatus.textContent = 'Letters, numbers, dots or underscores.'
+  setUserStatus('Letters, numbers, dots or underscores.')
 }
 async function checkUserId() {
   const version = ++checkVersion
   const id = userId.value.trim().toLowerCase()
   if (!/^[a-z0-9._]{1,30}$/.test(id)) return false
-  userStatus.textContent = 'Checking user ID…'
+  setUserStatus('Checking user ID…')
   try {
     const response = await fetch(`/api/sponsorship?action=check-user-id&user_id=${encodeURIComponent(id)}`)
     if (!response.ok) throw new Error()
     const result = await response.json()
     if (version !== checkVersion) return false
     if (result.exists) showExisting()
-    else { warning.hidden = true; returning = false; profileFields(false); userStatus.textContent = 'This user ID is available.' }
+    else { warning.hidden = true; returning = false; profileFields(false); setUserStatus('This user ID is available.', 'available') }
     return true
   } catch {
-    if (version === checkVersion) userStatus.textContent = 'Could not check this ID. Please try again before submitting.'
+    if (version === checkVersion) setUserStatus('Could not check this ID. Please try again before submitting.', 'taken')
     return false
   }
 }
@@ -96,7 +100,7 @@ verifyCode.addEventListener('click', async () => {
     codeEntry.hidden = true
     sendCode.hidden = true
     verificationMessage.textContent = 'Email verified. Enter your new payment details below.'
-    userStatus.textContent = 'Email verified.'
+    setUserStatus('Email verified.', 'available')
     ;(form.elements.namedItem('amount') as HTMLInputElement).focus()
   } catch (error) { if (activeChallenge === challenge) verificationMessage.textContent = (error as Error).message }
   finally { verifyCode.disabled = false }
