@@ -17,6 +17,12 @@ button:focus-visible { outline: 3px solid #a84664; outline-offset: 5px; }
 p, h1, h2, h3 { margin: 0; }
 .page { max-width: 1280px; margin: auto; padding: 44px 56px 24px; }
 .page-header { display: flex; align-items: center; justify-content: space-between; padding-bottom: 32px; border-bottom: 1px solid var(--line); }
+.page-header { flex-wrap: wrap; gap: 20px; }
+.brand { display: flex; align-items: center; gap: 16px; min-width: 0; }
+.brand-logo { width: 64px; height: 64px; object-fit: contain; flex-shrink: 0; }
+.brand-copy { min-width: 0; }
+:lang(ta) { font-family: 'Noto Sans Tamil', sans-serif; font-weight: 400; line-height: 1.9; }
+.tamil-tagline { color: var(--muted); font-size: 12px; margin-top: 8px; text-wrap: balance; }
 h1 { display: flex; align-items: center; gap: 10px; font-size: 25px; line-height: 1.3; letter-spacing: -0.035em; }
 .heart { width: 25px; height: 25px; fill: #ef7a96; stroke: #cb4d70; stroke-width: 1.5; stroke-linejoin: round; transform: rotate(10deg); }
 .heart-shine { fill: none; stroke: #fff0f4; stroke-width: 2.5; stroke-linecap: round; }

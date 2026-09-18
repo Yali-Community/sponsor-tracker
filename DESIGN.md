@@ -57,6 +57,8 @@ Circular portraits are the signature. Contribution rows and sponsor buttons have
 
 ## Components
 
+- **Yali identity:** use the supplied, unmodified `public/yali-logo.png` at 64px beside the Sponsors heading. The Tamil tagline reads “உங்கள் ஆதரவு, எங்கள் வலிமை.” (Your support is our strength.) and the footer thanks every supporter. Tamil text uses bundled Noto Sans Tamil with `lang="ta"`; retain the pink and pastel page palette.
+
 - **Selection:** native sponsor and contribution buttons select the same record and synchronize `aria-pressed`. Tab navigates; Enter and Space activate. Focus uses a 2px rose outline with 5px offset. A polite, atomic live region announces details. Mobile selection scrolls details into view without moving focus.
 - **Portraits:** valid HTTPS or root-relative photos cover circles; missing or failed photos reveal initials. Decorative images are hidden from assistive technology; buttons announce the sponsor and amount.
 - **Motion:** arrival lasts 750ms, staggered by 35ms up to 500ms. Portrait hover transitions last 450ms; row background transitions last 180ms. Reduced motion disables animation, transitions, hover transforms, and smooth detail scrolling.
