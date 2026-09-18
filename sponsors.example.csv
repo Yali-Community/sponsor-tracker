@@ -1,0 +1,4 @@
+profile_picture,name,social_id,amount,transaction_id,notes
+https://example.com/sponsor-1.jpg,Demo Sponsor One,demo_sponsor_one,5000,DEMO-TXN-001,Sample sponsorship
+https://example.com/sponsor-2.jpg,Demo Sponsor Two,demo_sponsor_two,2500,DEMO-TXN-002,
+https://example.com/sponsor-3.jpg,Demo Sponsor Three,demo_sponsor_three,1000,DEMO-TXN-003,"Dummy entry, replace with real details"
