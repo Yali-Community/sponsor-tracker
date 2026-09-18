@@ -11,18 +11,19 @@ function secret() {
   return value
 }
 export function hash(value: string) { return createHmac('sha256', secret()).update(value).digest('hex') }
-export function signToken(kind: 'login' | 'session', seconds: number) {
-  const payload = Buffer.from(JSON.stringify({ kind, expires: Date.now() + seconds * 1000, nonce: randomUUID(), scope: namespace() })).toString('base64url')
+type TokenKind = 'login' | 'session' | 'sponsor-code' | 'sponsor-verified'
+export function signToken(kind: TokenKind, seconds: number, details: { user_id?: string; request_id?: string; code_hash?: string } = {}) {
+  const payload = Buffer.from(JSON.stringify({ ...details, kind, expires: Date.now() + seconds * 1000, nonce: randomUUID(), scope: namespace() })).toString('base64url')
   return `${payload}.${hash(payload)}`
 }
-export function verifyToken(token: string, kind: 'login' | 'session') {
+export function verifyToken(token: string, kind: TokenKind) {
   try {
     const [payload, signature, extra] = token.split('.')
     if (extra || !payload || !/^[a-f0-9]{64}$/.test(signature)) return null
     if (!timingSafeEqual(Buffer.from(hash(payload)), Buffer.from(signature))) return null
     const data = JSON.parse(Buffer.from(payload, 'base64url').toString())
     if (data.kind !== kind || data.scope !== namespace() || data.expires <= Date.now() || typeof data.nonce !== 'string') return null
-    return data as { nonce: string; expires: number }
+    return data as { nonce: string; expires: number; user_id?: string; request_id?: string; code_hash?: string }
   } catch { return null }
 }
 export function adminSession(cookie = '') {

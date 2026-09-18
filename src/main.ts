@@ -39,12 +39,16 @@ function avatar(sponsor: Sponsor, index: number) {
 async function loadSponsors() {
 try {
   let sponsors: Sponsor[]
+  let entries: Sponsor[]
   if (import.meta.env.DEV) {
     sponsors = parseSponsors(csv)
+    entries = sponsors
   } else {
     const response = await fetch('/api/sponsorship?action=public')
     if (!response.ok) throw new Error('Please refresh the page in a moment.')
-    sponsors = await response.json()
+    const data = await response.json()
+    sponsors = data.sponsors
+    entries = data.contributions
   }
   const total = totalAmount(sponsors)
   const photos = sponsors.filter(sponsor => profileUrl(sponsor.profile_picture)).slice(0, 3)
@@ -89,10 +93,10 @@ try {
   const buttons: HTMLButtonElement[] = []
   const rows: HTMLButtonElement[] = []
 
-  function select(index: number, reveal = false) {
-    const sponsor = sponsors[index]
+  function select(index: number, reveal = false, contribution?: Sponsor) {
+    const sponsor = contribution || sponsors[index]
     buttons.forEach((button, i) => button.setAttribute('aria-pressed', String(i === index)))
-    rows.forEach((button, i) => button.setAttribute('aria-pressed', String(i === index)))
+    rows.forEach((button, i) => button.setAttribute('aria-pressed', String(entries[i] === contribution)))
     selected.replaceChildren()
     const heading = element('div', 'selected-heading')
     const identity = element('div', 'identity')
@@ -120,6 +124,9 @@ try {
     button.addEventListener('click', () => select(index, true))
     buttons.push(button)
     grid.append(button)
+  })
+  entries.forEach((sponsor) => {
+    const index = sponsors.findIndex(profile => profile.user_id === sponsor.user_id)
     const row = element('li', '')
     const rowButton = element('button', 'contribution')
     rowButton.type = 'button'
@@ -135,7 +142,7 @@ try {
     meta.append(element('span', 'user-id', `@${sponsor.user_id}`), document.createTextNode(' · submitted '), time)
     activity.append(sentence, meta)
     rowButton.append(avatar(sponsor, index), activity)
-    rowButton.addEventListener('click', () => select(index, true))
+    rowButton.addEventListener('click', () => select(index, true, sponsor))
     rows.push(rowButton)
     row.append(rowButton)
     row.dataset.paidAt = sponsor.paid_at

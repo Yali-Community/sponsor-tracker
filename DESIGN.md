@@ -31,7 +31,7 @@ rounded:
 
 ## Overview
 
-Preserve the ivory canvas and pink heart identity. Keep the page minimal and sleek, with totals and contributions beside an open grid of pastel circular portraits. This document describes source code; browser visual verification has not been performed.
+Preserve the ivory canvas and pink heart identity. Keep the page minimal and sleek, with totals and contributions beside an open grid of pastel circular portraits. The returning-sponsor form and admin review workspace have been checked in a browser at desktop and mobile sizes.
 
 ## Colors
 
@@ -64,7 +64,8 @@ Circular portraits are the signature. Contribution rows and sponsor buttons have
 - **Motion:** arrival lasts 750ms, staggered by 35ms up to 500ms. Portrait hover transitions last 450ms; row background transitions last 180ms. Reduced motion disables animation, transitions, hover transforms, and smooth detail scrolling.
 - **Data:** production loads approved entries from the API. The sample CSV is local-development data only. Public fields exclude email and payment references. Empty approved data shows a zero total and a welcoming empty wall.
 - **Sponsor form:** a native modal pairs a plain QR with labeled fields; submission time is recorded automatically. Mobile stacks the QR above the form. Preserve input on errors, reuse request IDs for retries, and focus the saved-pending confirmation after success.
-- **Admin:** email-link sign-in protects pending requests and CSV export. Review cards expose payment details for manual checking, with approve, reject, and email retry actions. Logout clears private rows and invalidates stale loads.
+- **Returning sponsors:** check handles as they are entered. Existing IDs show an explicit warning, hide shared profile fields, and require an email code sent to the saved address. Only new payment details and a note are entered. Clear verification when the ID changes.
+- **Admin:** email-link sign-in protects pending requests and CSV export. A centered sign-in surface opens into a review queue with status counts, filters, search and responsive review cards. Cards expose payment details for manual checking, with approve, reject, and email retry actions. Logout clears private rows and invalidates stale loads.
 
 ## Do's and Don'ts
 

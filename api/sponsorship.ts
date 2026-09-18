@@ -1,7 +1,9 @@
 import type { IncomingMessage, ServerResponse } from 'node:http'
+import { randomInt } from 'node:crypto'
 import { get, put, del } from '@vercel/blob'
 import { validateSubmission, HttpError } from '../server/validation.ts'
-import { readRecords, updateRecords, claimOnce, limit, csvFor, publicRecord, type ReviewRecord } from '../server/store.ts'
+import { readRecords, updateRecords, claimOnce, limit, csvFor, publicRecord, publicSponsors, type ReviewRecord } from '../server/store.ts'
+import { createSponsorChallenge, confirmSponsorCode, requireSponsorVerification } from '../server/sponsor-auth.ts'
 import { checkOrigin, requireAdmin, adminSession, signToken, verifyToken, namespace, hash } from '../server/security.ts'
 import { sendEmail } from '../server/email.ts'
 import { notify, deliveryInProgress } from '../server/notifications.ts'
@@ -21,7 +23,13 @@ export default async function handler(req: Request, res: ServerResponse) {
     if (req.method === 'GET') {
       if (action === 'public') {
         const { records } = await readRecords()
-        return json(res, 200, records.filter(item => item.status === 'approved').map(publicRecord))
+        return json(res, 200, { sponsors: publicSponsors(records), contributions: records.filter(record => record.status === 'approved').map(publicRecord) })
+      }
+      if (action === 'check-user-id') {
+        const userId = (url.searchParams.get('user_id') || '').trim().toLowerCase()
+        if (!/^[a-z0-9._]{1,30}$/.test(userId)) throw new HttpError(400, 'Enter a valid user ID.')
+        const { records } = await readRecords()
+        return json(res, 200, { exists: records.some(record => record.user_id.toLowerCase() === userId) })
       }
       if (action === 'photo') {
         const { records } = await readRecords()
@@ -49,6 +57,30 @@ export default async function handler(req: Request, res: ServerResponse) {
     if (!req.body || typeof req.body !== 'object' || Array.isArray(req.body)) throw new HttpError(400, 'Invalid request.')
     if (JSON.stringify(req.body).length > 1450000) throw new HttpError(413, 'The photo is too large.')
     const input = req.body as Record<string, unknown>
+    if (action === 'send-sponsor-code') {
+      const userId = typeof input.user_id === 'string' ? input.user_id.trim().toLowerCase() : ''
+      const requestId = typeof input.request_id === 'string' ? input.request_id : ''
+      if (!/^[a-z0-9._]{1,30}$/.test(userId) || !/^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(requestId)) throw new HttpError(400, 'Check your user ID and reload the form.')
+      const account = (await readRecords()).records.find(record => record.user_id.toLowerCase() === userId)
+      if (!account) throw new HttpError(404, 'This user ID is available. Enter your profile details to continue.')
+      const ip = String(req.headers['x-forwarded-for'] || req.socket.remoteAddress || 'unknown').split(',')[0]
+      await limit(`sponsor-code-ip:${ip}`, 60)
+      await limit(`sponsor-code-user:${userId}`, 60)
+      const code = String(randomInt(100000, 1000000))
+      await sendEmail(account.email, 'Your Yali sponsorship verification code', `Your verification code is ${code}.\n\nUse it within 10 minutes to submit another contribution under @${userId}. Never share this code. If you did not request it, ignore this email.\n\nYali`)
+      return json(res, 200, { challenge: createSponsorChallenge(userId, requestId, code) })
+    }
+    if (action === 'verify-sponsor-code') {
+      const challenge = typeof input.challenge === 'string' ? input.challenge : ''
+      const data = verifyToken(challenge, 'sponsor-code')
+      if (!data) throw new HttpError(400, 'This code has expired. Request a new one.')
+      let attemptAllowed = false
+      for (let attempt = 0; attempt < 5; attempt++) {
+        if (await claimOnce(`sponsor-code-attempts/${hash(data.nonce)}/${attempt}`)) { attemptAllowed = true; break }
+      }
+      if (!attemptAllowed) throw new HttpError(429, 'Too many attempts. Request a new code.')
+      return json(res, 200, { verification: confirmSponsorCode(challenge, String(input.code || '')) })
+    }
     if (action === 'login-link') {
       await limit('admin-login', 300)
       const token = signToken('login', 600)
@@ -70,12 +102,17 @@ export default async function handler(req: Request, res: ServerResponse) {
       return json(res, 200, { ok: true })
     }
     if (action === 'submit') {
-      const submission = validateSubmission(input)
-      const existing = (await readRecords()).records.find(item => item.request_id === submission.request_id)
+      const current = (await readRecords()).records
+      const userId = typeof input.user_id === 'string' ? input.user_id.trim().toLowerCase() : ''
+      const existing = current.find(item => item.request_id === input.request_id)
       if (existing) {
-        if (existing.email !== submission.email || existing.user_id !== submission.user_id) throw new HttpError(409, 'Please reload the form.')
+        if (existing.user_id !== userId) throw new HttpError(409, 'Please reload the form.')
+        if (typeof input.email !== 'string' || existing.email !== input.email.trim().toLowerCase()) requireSponsorVerification(input.verification, userId, input.request_id)
         return json(res, 200, { request_id: existing.request_id, status: existing.status, emailSent: existing.pending_email === 'sent' })
       }
+      const account = current.find(record => record.user_id.toLowerCase() === userId)
+      if (account) requireSponsorVerification(input.verification, userId, input.request_id)
+      const submission = validateSubmission(account ? { ...input, name: account.name, email: account.email, social_id: account.social_id, photo: '' } : input)
       const ip = String(req.headers['x-forwarded-for'] || req.socket.remoteAddress || 'unknown').split(',')[0]
       await limit(`submit-ip:${ip}`, 60)
       await limit(`submit-email:${submission.email}`, 300)
@@ -92,11 +129,12 @@ export default async function handler(req: Request, res: ServerResponse) {
           request_id: submission.request_id, user_id: submission.user_id, name: submission.name,
           email: submission.email, social_id: submission.social_id, amount: submission.amount,
           paid_at: submission.paid_at, transaction_id: submission.transaction_id, notes: submission.notes,
-          photo_path: photoPath, photo_type: submission.photo?.type || '', status: 'pending',
+          photo_path: account?.photo_path || photoPath, photo_type: account?.photo_type || submission.photo?.type || '', status: 'pending',
           submitted_at: submission.paid_at, reviewed_at: '', pending_email: '', decision_email: '',
+          returning_user_verified: account ? 'yes' : '',
         }
         await updateRecords(records => {
-          if (records.some(item => item.user_id === record.user_id)) throw new HttpError(409, 'This user ID is already in use. Choose another.')
+          if (records.some(item => item.user_id.toLowerCase() === record.user_id)) requireSponsorVerification(input.verification, record.user_id, record.request_id)
           if (records.some(item => item.transaction_id.toLowerCase() === record.transaction_id.toLowerCase())) throw new HttpError(409, 'This payment reference has already been submitted.')
           records.push(record)
         })
@@ -138,7 +176,7 @@ export default async function handler(req: Request, res: ServerResponse) {
     }
     throw new HttpError(404, 'Not found.')
   } catch (error) {
-    if (error instanceof HttpError) return json(res, error.status, { error: error.message })
+    if (error instanceof HttpError) return json(res, error.status, { error: error.message, code: error.code })
     console.error('Sponsorship request failed:', error instanceof Error ? error.name : 'UnknownError')
     return json(res, 503, { error: 'We couldn’t complete this request. Please try again shortly.' })
   }

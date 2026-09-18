@@ -45,13 +45,22 @@
             <h3 id="sponsor-dialog-title">Your sponsorship</h3>
             <p class="form-intro">Scan to pay, then send your details for review.</p>
             <div class="form-fields">
-              <label>Name<input name="name" autocomplete="name" maxlength="80" required /></label>
-              <label>User ID<input name="user_id" placeholder="john.doe" pattern="[a-zA-Z0-9._]{1,30}" maxlength="30" autocomplete="username" required /><small>Unique handle. Letters, numbers, dots or underscores.</small></label>
-              <label class="full-width">Email<input name="email" type="email" autocomplete="email" maxlength="254" required /><small>For your confirmation and approval updates. Kept private.</small></label>
+              <label class="full-width">User ID<input name="user_id" placeholder="john.doe" pattern="[a-zA-Z0-9._]{1,30}" maxlength="30" autocomplete="username" aria-describedby="user-id-status" required /><small id="user-id-status" role="status">Letters, numbers, dots or underscores.</small></label>
+              <div id="existing-user-warning" class="existing-user-warning full-width" hidden>
+                <p class="warning-title"><span data-icon="warning"></span>User ID already exists</p>
+                <p id="existing-user-copy"></p>
+                <div class="verification-actions">
+                  <button type="button" id="send-sponsor-code" class="quiet-button"><span data-icon="mail"></span>Send verification code</button>
+                  <div id="code-entry" hidden><label>Email code<input id="sponsor-code" inputmode="numeric" autocomplete="one-time-code" maxlength="6" placeholder="6-digit code" /></label><button type="button" id="verify-sponsor-code" class="primary-button">Verify email</button></div>
+                </div>
+                <p id="verification-message" role="status"></p>
+              </div>
+              <label data-profile-field>Name<input name="name" autocomplete="name" maxlength="80" required /></label>
+              <label class="full-width" data-profile-field>Email<input name="email" type="email" autocomplete="email" maxlength="254" required /><small>For your confirmation and approval updates. Kept private.</small></label>
               <label>Amount (₹)<input name="amount" type="number" min="0.01" max="1000000" step="0.01" inputmode="decimal" required /></label>
               <label class="full-width">UPI transaction ID<input name="transaction_id" maxlength="100" required /><small>Your payment reference, visible only to the admin.</small></label>
-              <label class="full-width">Social ID <span>(optional)</span><input name="social_id" maxlength="100" placeholder="Any social handle" /></label>
-              <label class="full-width">Profile photo <span>(optional)</span><input name="photo" type="file" accept="image/png,image/jpeg" /><small>PNG or JPEG, up to 1 MB. Initials are used if omitted.</small></label>
+              <label class="full-width" data-profile-field>Social ID <span>(optional)</span><input name="social_id" maxlength="100" placeholder="Any social handle" /></label>
+              <label class="full-width" data-profile-field>Profile photo <span>(optional)</span><input name="photo" type="file" accept="image/png,image/jpeg" /><small>PNG or JPEG, up to 1 MB. Initials are used if omitted.</small></label>
               <label class="full-width">Note <span>(optional)</span><textarea name="notes" rows="2" maxlength="500" placeholder="A few words of support…"></textarea></label>
             </div>
             <label class="honeypot" aria-hidden="true">Website<input name="website" tabindex="-1" autocomplete="off" /></label>

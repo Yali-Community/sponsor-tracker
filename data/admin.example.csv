@@ -1,1 +1,1 @@
-request_id,user_id,name,email,social_id,amount,paid_at,transaction_id,notes,photo_path,photo_type,status,submitted_at,reviewed_at,pending_email,decision_email
+request_id,user_id,name,email,social_id,amount,paid_at,transaction_id,notes,photo_path,photo_type,status,submitted_at,reviewed_at,pending_email,decision_email,returning_user_verified

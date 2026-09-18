@@ -5,12 +5,12 @@ A TypeScript + Vite sponsor wall with a QR payment form and private admin review
 ## How it works
 
 1. Click **Sponsor**, scan the supplied UPI QR, and pay using your own UPI app.
-2. Enter your name, unique user ID, email, amount, and transaction reference. Social ID, profile photo, and note are optional.
+2. Enter your user ID. For a new ID, provide your name and email; social ID and profile photo are optional. For an existing ID, verify a six-digit code sent to its saved email; shared profile fields are hidden and reused on the server. Enter the new amount, transaction reference and optional note.
 3. Submit for review. The server records the submission time automatically. The request is saved as **pending** and a confirmation email is sent.
 4. Open **/admin.html**, request an email sign-in link, and review the payment against your UPI account. Approve to publish or reject to keep it hidden. The contributor receives a status email.
-5. The public page fetches approved entries on each page load. No rebuild is needed after approval.
+5. The public page shows one profile per user ID with approved amounts combined, alongside individual contribution entries and their notes. It fetches approved entries on each page load. No rebuild is needed after approval.
 
-The form does **not** verify or initiate payments. Admin approval is manual. One request per unique user ID and payment reference is allowed, including rejected entries; contact the admin to correct an existing request.
+The form does **not** verify or initiate payments. Admin approval is manual. Payment references must be unique. Returning sponsors can make multiple contributions under one user ID after verifying the saved email for each new request. Codes expire after ten minutes and allow five attempts; code requests are rate-limited. Changing the ID clears verification. Contact the admin to correct saved profile details.
 
 ## Private CSV and photos
 

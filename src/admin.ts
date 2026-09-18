@@ -6,12 +6,15 @@ interface Review {
   request_id: string; name: string; user_id: string; email: string; social_id: string
   amount: string; submitted_at: string; transaction_id: string; notes: string; photo_path: string
   status: 'pending' | 'approved' | 'rejected'; pending_email: string; decision_email: string
+  returning_user_verified?: string
 }
 const status = document.querySelector<HTMLParagraphElement>('#admin-message')!
 const login = document.querySelector<HTMLElement>('#admin-login')!
 const content = document.querySelector<HTMLElement>('#admin-content')!
 const list = document.querySelector('#review-list')!
-const filter = document.querySelector<HTMLSelectElement>('#status-filter')!
+const search = document.querySelector<HTMLInputElement>('#review-search')!
+const filters = document.querySelectorAll<HTMLButtonElement>('[data-status]')
+let activeStatus = 'pending'
 let records: Review[] = []
 let generation = 0
 let signingOut = false
@@ -47,8 +50,20 @@ async function load() {
 }
 function render() {
   list.replaceChildren()
-  const filtered = records.filter(record => record.status === filter.value)
-  if (!filtered.length) list.append(node('p', `No ${filter.value} requests.`, 'empty-state'))
+  filters.forEach(button => {
+    button.setAttribute('aria-pressed', String(button.dataset.status === activeStatus))
+    button.querySelector('[data-count]')!.textContent = String(records.filter(record => record.status === button.dataset.status).length)
+  })
+  const query = search.value.trim().toLowerCase()
+  const filtered = records.filter(record => record.status === activeStatus &&
+    [record.name, record.user_id, record.email, record.transaction_id].some(value => value.toLowerCase().includes(query)))
+    .sort((a, b) => b.submitted_at.localeCompare(a.submitted_at))
+  if (!filtered.length) {
+    const empty = node('div', '', 'review-empty')
+    empty.append(node('h3', query ? 'No matching requests' : activeStatus === 'pending' ? 'You’re all caught up.' : `No ${activeStatus} requests yet.`),
+      node('p', query ? 'Try another name, user ID or payment reference.' : 'New submissions will appear in Pending, ready for your review.'))
+    list.append(empty)
+  }
   for (const record of filtered) {
     const article = node('article', '', 'review-entry')
     const heading = node('div', '', 'review-heading')
@@ -59,16 +74,27 @@ function render() {
       image.width = 56; image.height = 56
       heading.append(image)
     }
-    heading.append(node('h2', record.name), node('span', `₹${record.amount}`, 'review-amount'))
+    else heading.append(node('span', record.name.split(/\s+/).slice(0, 2).map(part => part[0]).join(''), 'review-initials'))
+    const identity = node('div', '', 'review-identity')
+    identity.append(node('h2', record.name), node('p', '@' + record.user_id))
+    const amount = node('div', '', 'review-amount')
+    amount.append(node('strong', new Intl.NumberFormat('en-IN', { style: 'currency', currency: 'INR', maximumFractionDigits: 2 }).format(Number(record.amount))), node('span', record.status, `review-badge ${record.status}`))
+    heading.append(identity, amount)
     article.append(heading)
+    if (records.some(other => other.request_id !== record.request_id && other.user_id === record.user_id)) {
+      article.append(node('p', `Existing user ID · ${record.returning_user_verified === 'yes' ? 'Saved email verified for this contribution.' : 'Another request uses this ID.'} Verify this payment before approving. Approval adds this amount to the existing profile.`, 'review-repeat'))
+    }
     const details = node('dl', '', 'review-details')
     for (const [label, value] of [
-      ['User ID', '@' + record.user_id], ['Email', record.email], ['Social ID', record.social_id || '—'],
+      ['Email', record.email], ['Social ID', record.social_id || '—'],
       ['Submitted at', new Date(record.submitted_at).toLocaleString()], ['Payment reference', record.transaction_id],
-      ['Note', record.notes || '—'], ['Request', record.request_id],
+      ['Note', record.notes || '—'],
       ['Email delivery', record.status === 'pending' ? record.pending_email || 'waiting' : record.decision_email || 'waiting'],
     ]) details.append(node('dt', label), node('dd', value))
     article.append(details)
+    const reference = node('details', '', 'review-reference')
+    reference.append(node('summary', 'Request reference'), node('p', record.request_id))
+    article.append(reference)
     const actions = node('div', '', 'review-actions')
     async function act(action: string, decision?: string) {
       const buttons = [...actions.querySelectorAll('button')]
@@ -102,7 +128,8 @@ function render() {
     list.append(article)
   }
 }
-filter.addEventListener('change', render)
+filters.forEach(button => button.addEventListener('click', () => { activeStatus = button.dataset.status!; render() }))
+search.addEventListener('input', render)
 document.querySelector('#admin-refresh')!.addEventListener('click', () => void load())
 document.querySelector('#send-login')!.addEventListener('click', async event => {
   const button = event.currentTarget as HTMLButtonElement

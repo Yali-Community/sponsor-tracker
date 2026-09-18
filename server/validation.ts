@@ -1,6 +1,7 @@
 export class HttpError extends Error {
   status: number
-  constructor(status: number, message: string) { super(message); this.status = status }
+  code?: string
+  constructor(status: number, message: string, code?: string) { super(message); this.status = status; this.code = code }
 }
 export interface Submission {
   request_id: string

@@ -20,8 +20,9 @@ export interface ReviewRecord {
   reviewed_at: string
   pending_email: string
   decision_email: string
+  returning_user_verified?: string
 }
-export const reviewFields = ['request_id','user_id','name','email','social_id','amount','paid_at','transaction_id','notes','photo_path','photo_type','status','submitted_at','reviewed_at','pending_email','decision_email']
+export const reviewFields = ['request_id','user_id','name','email','social_id','amount','paid_at','transaction_id','notes','photo_path','photo_type','status','submitted_at','reviewed_at','pending_email','decision_email','returning_user_verified']
 export function csvFor(records: ReviewRecord[], exportForExcel = false) {
   return Papa.unparse({ fields: reviewFields, data: records }, { escapeFormulae: exportForExcel })
 }
@@ -35,7 +36,7 @@ export async function readRecords() {
   if (blob.statusCode !== 200) throw new Error('Unexpected storage response')
   const csv = await new Response(blob.stream).text()
   const parsed = Papa.parse<ReviewRecord>(csv, { header: true, skipEmptyLines: true })
-  if (parsed.errors.length || reviewFields.some(field => !parsed.meta.fields?.includes(field))) throw new Error('Invalid private review CSV')
+  if (parsed.errors.length || reviewFields.filter(field => field !== 'returning_user_verified').some(field => !parsed.meta.fields?.includes(field))) throw new Error('Invalid private review CSV')
   return { records: parsed.data, etag: blob.blob.etag }
 }
 export async function updateRecords<T>(change: (records: ReviewRecord[]) => T): Promise<T> {
@@ -75,4 +76,17 @@ export function publicRecord(record: ReviewRecord) {
     profile_picture: record.photo_path ? `/api/sponsorship?action=photo&id=${record.request_id}` : '',
     transaction_id: '',
   }
+}
+export function publicSponsors(records: ReviewRecord[]) {
+  const sponsors = new Map<string, ReturnType<typeof publicRecord>>()
+  for (const record of records.filter(record => record.status === 'approved')) {
+    const key = record.user_id.toLowerCase()
+    const sponsor = sponsors.get(key)
+    if (!sponsor) sponsors.set(key, publicRecord(record))
+    else {
+      sponsor.amount = (Math.round(sponsor.amount * 100) + Math.round(Number(record.amount) * 100)) / 100
+      if (record.submitted_at > sponsor.paid_at) sponsor.paid_at = record.submitted_at
+    }
+  }
+  return [...sponsors.values()]
 }
