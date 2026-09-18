@@ -65,6 +65,8 @@ Circular portraits are the signature. Contribution rows and sponsor buttons have
 
 ## Do's and Don'ts
 
+The contribution feed uses small avatars and “Name paid ₹amount” sentences, with an @user_id and relative payment time below. Order it newest first using the CSV's UTC `paid_at` field; refresh labels every 30 seconds. Keep handles unique, case-insensitive, and independent of social IDs. Row hover uses a 3px horizontal nudge and warm background; reduced motion disables the nudge. Transaction IDs remain hidden.
+
 - Do preserve the ivory canvas, orange heart, pastel circles, visible focus, and restrained motion.
 - Do synchronize selected details between both entry points.
 - Don't imply example records are verified sponsors or CSV edits automatically update deployed builds.

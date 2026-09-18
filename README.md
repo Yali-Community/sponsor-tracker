@@ -6,6 +6,8 @@ A minimal TypeScript and Vite sponsor wall with an orange heart, warm-toned avat
 
 Edit `sponsors.example.csv` in the repository root. The page imports it at build time; rebuild and redeploy after changing it. Every row appears in the avatar wall and contributions list. All included entries are fictional sample data.
 
+- `user_id`: unique handle, without @; 1–30 letters, numbers, dots, or underscores. IDs are normalized to lowercase and must be unique. One row per user.
+- `paid_at`: UTC payment timestamp in `YYYY-MM-DDTHH:mm:ssZ` format (for example, `2026-09-18T05:40:00Z`).
 - `profile_picture`: HTTPS image URL or a root-relative path to an image in `public/`. Blank or failed images display initials.
 - `name`: sponsor name (required).
 - `social_id`: plain text, not restricted to a platform.
@@ -46,3 +48,5 @@ No environment variables are required.
 ## Color theme
 
 Colors follow [mohan-bee/yali](https://github.com/mohan-bee/yali/blob/main/src/style.css): paper `#faf7ef`, ink `#20211c`, muted `#626155`, orange `#f58612`, and dividers `#d8d4c8`. Focus uses Yali’s burnt orange `#9c4200`; avatar backgrounds are soft tints that complement this palette.
+
+Contributions are ordered newest first and display a name, paid amount, @user_id, and relative payment time. Times refresh every 30 seconds using the visitor’s clock. Sample timestamps are fixed fictional data, so they naturally age rather than always claiming “just now.”

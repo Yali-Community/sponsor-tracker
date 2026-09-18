@@ -4,7 +4,7 @@ import '@fontsource/manrope/latin-600.css'
 import '@fontsource/manrope/latin-700.css'
 import './style.css'
 import csv from '../sponsors.example.csv?raw'
-import { parseSponsors, profileUrl, totalAmount, type Sponsor } from './sponsors'
+import { parseSponsors, profileUrl, relativePaymentTime, totalAmount, type Sponsor } from './sponsors'
 
 const currency = new Intl.NumberFormat('en-IN', {
   style: 'currency', currency: 'INR', maximumFractionDigits: 2,
@@ -72,6 +72,7 @@ try {
     const heading = element('div', 'selected-heading')
     const identity = element('div', 'identity')
     identity.append(element('h3', '', sponsor.name))
+    identity.append(element('p', 'user-id', `@${sponsor.user_id}`))
     if (sponsor.social_id) identity.append(element('p', 'social-id', sponsor.social_id))
     heading.append(avatar(sponsor, index), identity)
     selected.append(heading, element('p', 'selected-amount', `${formatAmount(sponsor.amount)} contributed`))
@@ -86,6 +87,7 @@ try {
   sponsors.forEach((sponsor, index) => {
     const button = element('button', 'sponsor')
     button.type = 'button'
+    button.dataset.userId = sponsor.user_id
     button.style.setProperty('--delay', `${Math.min(index * 35, 500)}ms`)
     button.setAttribute('aria-label', `${sponsor.name}, ${formatAmount(sponsor.amount)}. Show details`)
     button.setAttribute('aria-controls', selected.id)
@@ -96,13 +98,31 @@ try {
     const row = element('li', '')
     const rowButton = element('button', 'contribution')
     rowButton.type = 'button'
+    rowButton.dataset.userId = sponsor.user_id
     rowButton.setAttribute('aria-controls', selected.id)
-    rowButton.append(element('span', 'contributor-name', sponsor.name), element('span', 'contribution-amount', formatAmount(sponsor.amount)))
+    const activity = element('span', 'activity')
+    const sentence = element('span', 'activity-sentence')
+    sentence.append(element('strong', '', sponsor.name), document.createTextNode(' paid '), element('strong', '', formatAmount(sponsor.amount)))
+    const meta = element('span', 'activity-meta')
+    const time = element('time', 'payment-time', relativePaymentTime(sponsor.paid_at))
+    time.dateTime = sponsor.paid_at
+    time.title = new Date(sponsor.paid_at).toLocaleString()
+    meta.append(element('span', 'user-id', `@${sponsor.user_id}`), document.createTextNode(' · '), time)
+    activity.append(sentence, meta)
+    rowButton.append(avatar(sponsor, index), activity)
     rowButton.addEventListener('click', () => select(index, true))
     rows.push(rowButton)
     row.append(rowButton)
+    row.dataset.paidAt = sponsor.paid_at
     list.append(row)
   })
+  list.replaceChildren(...Array.from(list.children).sort((a, b) =>
+    Date.parse((b as HTMLElement).dataset.paidAt!) - Date.parse((a as HTMLElement).dataset.paidAt!)))
+  window.setInterval(() => {
+    list.querySelectorAll<HTMLTimeElement>('time').forEach((time) => {
+      time.textContent = relativePaymentTime(time.dateTime)
+    })
+  }, 30000)
   contributions.append(list)
   wall.append(wallHeading, grid)
   if (sponsors.length) {
