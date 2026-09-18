@@ -11,6 +11,9 @@
   <body>
     <main class="page">
       <header class="page-header">
+        <div class="brand">
+          <img class="brand-logo" src="/yali-logo.png" alt="Yali — யாளி" width="64" height="64" />
+          <div class="brand-copy">
         <h1>
           Sponsors
           <svg class="heart" viewBox="0 0 32 32" aria-hidden="true">
@@ -18,14 +21,63 @@
             <path class="heart-shine" d="M8 11c0-2 2-3 3-2" />
           </svg>
         </h1>
-        <span class="demo-label">Sample sponsors</span>
+            <p class="tamil-tagline" lang="ta">உங்கள் ஆதரவு, எங்கள் வலிமை.</p>
+          </div>
+        </div>
+        <button id="sponsor-button" class="sponsor-cta" type="button" aria-haspopup="dialog">
+          <span class="sponsor-label"><span data-icon="heart"></span>Sponsor</span><span id="sponsor-photos" class="cta-circles" aria-hidden="true" hidden></span>
+        </button>
       </header>
       <div class="layout" id="sponsors-app">
         <p role="status">Loading sponsors…</p>
       </div>
       <noscript>Enable JavaScript to view the sponsor wall.</noscript>
-      <footer><span>A little support. A lot of possibility.</span><span>Made possible by people.</span></footer>
+      <footer><span>A little support. A lot of possibility.</span><span lang="ta">ஆதரவளிக்கும் ஒவ்வொருவருக்கும் நன்றி.</span><a href="/admin.html">Admin</a></footer>
     </main>
+    <dialog id="sponsor-dialog" aria-labelledby="sponsor-dialog-title">
+      <button type="button" class="dialog-close quiet-button" data-close-dialog aria-label="Close sponsor form" title="Close"><span data-icon="close"></span></button>
+      <div class="donation-layout">
+        <section class="payment-panel" aria-label="Scan to pay">
+          <img src="/payment-qr.svg" class="payment-qr" alt="Scan to pay Mohan with any UPI app" width="260" height="260" />
+        </section>
+        <section class="submission-panel">
+          <form id="sponsor-form">
+            <h3 id="sponsor-dialog-title">Your sponsorship</h3>
+            <p class="form-intro">Scan to pay, then send your details for review.</p>
+            <div class="form-fields">
+              <label class="full-width">User ID<input name="user_id" placeholder="john.doe" pattern="[a-zA-Z0-9._]{1,30}" maxlength="30" autocomplete="username" aria-describedby="user-id-status" required /><small id="user-id-status" role="status">Letters, numbers, dots or underscores.</small></label>
+              <div id="existing-user-warning" class="existing-user-warning full-width" hidden>
+                <p class="warning-title"><span data-icon="warning"></span>User ID already exists</p>
+                <p id="existing-user-copy"></p>
+                <div class="verification-actions">
+                  <button type="button" id="send-sponsor-code" class="quiet-button"><span data-icon="mail"></span>Send verification code</button>
+                  <div id="code-entry" hidden><label>Email code<input id="sponsor-code" inputmode="numeric" autocomplete="one-time-code" maxlength="6" placeholder="6-digit code" /></label><button type="button" id="verify-sponsor-code" class="primary-button">Verify email</button></div>
+                </div>
+                <p id="verification-message" role="status"></p>
+              </div>
+              <label data-profile-field>Name<input name="name" autocomplete="name" maxlength="80" required /></label>
+              <label class="full-width" data-profile-field>Email<input name="email" type="email" autocomplete="email" maxlength="254" required /><small>For your confirmation and approval updates. Kept private.</small></label>
+              <label>Amount (₹)<input name="amount" type="number" min="0.01" max="1000000" step="0.01" inputmode="decimal" required /></label>
+              <label class="full-width">UPI transaction ID<input name="transaction_id" maxlength="100" required /><small>Your payment reference, visible only to the admin.</small></label>
+              <label class="full-width" data-profile-field>Social ID <span>(optional)</span><input name="social_id" maxlength="100" placeholder="Any social handle" /></label>
+              <label class="full-width" data-profile-field>Profile photo <span>(optional)</span><input name="photo" type="file" accept="image/png,image/jpeg" /><small>PNG or JPEG, up to 1 MB. Initials are used if omitted.</small></label>
+              <label class="full-width">Note <span>(optional)</span><textarea name="notes" rows="2" maxlength="500" placeholder="A few words of support…"></textarea></label>
+            </div>
+            <label class="honeypot" aria-hidden="true">Website<input name="website" tabindex="-1" autocomplete="off" /></label>
+            <label class="consent"><input name="consent" type="checkbox" required /><span>I agree to publish my name, user ID, social ID, photo, amount, submission time and note after approval. My email and payment reference stay private.</span></label>
+            <p id="form-message" class="form-message" role="alert"></p>
+            <button type="submit" class="primary-button">Send for review</button>
+          </form>
+          <div id="submission-success" class="submission-success" tabindex="-1" hidden>
+            <h3>Your request is under review.</h3>
+            <p>Thank you for supporting Yali. Your sponsorship will be posted after your payment is verified and your entry is approved.</p>
+            <p id="email-result"></p>
+            <p id="request-reference" class="muted"></p>
+            <button type="button" class="primary-button" data-close-dialog>Done</button>
+          </div>
+        </section>
+      </div>
+    </dialog>
     <script type="module" src="/src/main.ts"></script>
   </body>
 </html>

@@ -1,16 +1,16 @@
-profile_picture,name,social_id,amount,transaction_id,notes
-https://example.com/sponsor-1.jpg,Demo Sponsor One,demo_sponsor_one,5000,DEMO-TXN-001,Sample sponsorship
-https://example.com/sponsor-2.jpg,Demo Sponsor Two,demo_sponsor_two,2500,DEMO-TXN-002,
-https://example.com/sponsor-3.jpg,Demo Sponsor Three,demo_sponsor_three,1000,DEMO-TXN-003,"Dummy entry, replace with real details"
-,Alex Morgan,demo_alex,3000,DEMO-TXN-004,For the next chapter.
-,Sam Rivera,demo_sam,1500,DEMO-TXN-005,
-,Jamie Park,demo_jamie,2000,DEMO-TXN-006,Happy to be a small part of it.
-,Taylor Reed,demo_taylor,500,DEMO-TXN-007,
-,Jordan Lee,demo_jordan,4000,DEMO-TXN-008,Keep building together.
-,Casey Brooks,demo_casey,750,DEMO-TXN-009,
-,Robin Ellis,demo_robin,1250,DEMO-TXN-010,
-,Avery Quinn,demo_avery,2500,DEMO-TXN-011,A little encouragement.
-,Drew Parker,demo_drew,600,DEMO-TXN-012,
-,Riley Chen,demo_riley,1000,DEMO-TXN-013,
-,Cameron Blake,demo_cameron,1800,DEMO-TXN-014,Cheering you on.
-,Morgan Lane,demo_morgan,900,DEMO-TXN-015,
+user_id,paid_at,profile_picture,name,social_id,amount,transaction_id,notes
+sponsor_one,2026-09-18T05:40:00Z,https://example.com/sponsor-1.jpg,Demo Sponsor One,demo_sponsor_one,5000,DEMO-TXN-001,Sample sponsorship
+sponsor_two,2026-09-18T05:30:00Z,https://example.com/sponsor-2.jpg,Demo Sponsor Two,demo_sponsor_two,2500,DEMO-TXN-002,
+sponsor_three,2026-09-18T05:20:00Z,https://example.com/sponsor-3.jpg,Demo Sponsor Three,demo_sponsor_three,1000,DEMO-TXN-003,"Dummy entry, replace with real details"
+alex,2026-09-18T05:10:00Z,,Alex Morgan,demo_alex,3000,DEMO-TXN-004,For the next chapter.
+sam,2026-09-18T05:00:00Z,,Sam Rivera,demo_sam,1500,DEMO-TXN-005,
+jamie,2026-09-18T04:50:00Z,,Jamie Park,demo_jamie,2000,DEMO-TXN-006,Happy to be a small part of it.
+taylor,2026-09-18T04:40:00Z,,Taylor Reed,demo_taylor,500,DEMO-TXN-007,
+jordan,2026-09-18T04:30:00Z,,Jordan Lee,demo_jordan,4000,DEMO-TXN-008,Keep building together.
+casey,2026-09-18T04:20:00Z,,Casey Brooks,demo_casey,750,DEMO-TXN-009,
+robin,2026-09-18T04:10:00Z,,Robin Ellis,demo_robin,1250,DEMO-TXN-010,
+avery,2026-09-18T04:00:00Z,,Avery Quinn,demo_avery,2500,DEMO-TXN-011,A little encouragement.
+drew,2026-09-18T03:50:00Z,,Drew Parker,demo_drew,600,DEMO-TXN-012,
+riley,2026-09-18T03:40:00Z,,Riley Chen,demo_riley,1000,DEMO-TXN-013,
+cameron,2026-09-18T03:30:00Z,,Cameron Blake,demo_cameron,1800,DEMO-TXN-014,Cheering you on.
+morgan,2026-09-18T03:20:00Z,,Morgan Lane,demo_morgan,900,DEMO-TXN-015,

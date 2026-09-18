@@ -1,0 +1,39 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="robots" content="noindex, nofollow" />
+  <meta name="referrer" content="no-referrer" />
+  <title>Sponsor review · Yali</title>
+  <link rel="icon" href="/heart.svg" type="image/svg+xml" />
+</head>
+<body>
+  <main class="page admin-page">
+    <header class="page-header admin-header"><div class="brand"><img src="/yali-logo.png" width="48" height="48" alt="Yali" /><div><h1>Sponsor review</h1><p>Every contribution, thoughtfully reviewed.</p></div></div><a class="icon-label" href="/"><span data-icon="back"></span>Back to sponsors</a></header>
+    <p id="admin-message" role="status" aria-live="polite"></p>
+    <section id="admin-login" class="admin-login-panel">
+      <span class="login-symbol"><span data-icon="shield"></span></span>
+      <h2>A little care behind<br>every contribution.</h2>
+      <p>Review payments, welcome sponsors, and keep their details safe. Sign in with a private link sent to your admin email.</p>
+      <button id="send-login" class="primary-button"><span data-icon="mail"></span>Email me a sign-in link</button>
+    </section>
+    <section id="admin-content" hidden>
+      <div class="review-intro"><div><h2>Your review queue</h2><p>Check each payment in your UPI account before publishing.</p></div><button id="admin-logout" class="quiet-button"><span data-icon="logout"></span>Sign out</button></div>
+      <div class="review-filters" aria-label="Filter requests">
+        <button data-status="pending" aria-pressed="true">Pending <span data-count="pending">0</span></button>
+        <button data-status="approved" aria-pressed="false">Approved <span data-count="approved">0</span></button>
+        <button data-status="rejected" aria-pressed="false">Rejected <span data-count="rejected">0</span></button>
+        <button data-status="revoked" aria-pressed="false">Revoked <span data-count="revoked">0</span></button>
+      </div>
+      <div class="admin-toolbar">
+        <label class="review-search"><span data-icon="search"></span><input id="review-search" type="search" placeholder="Search name, user ID or payment reference" aria-label="Search requests" /></label>
+        <a href="/api/sponsorship?action=export" class="text-link icon-label"><span data-icon="download"></span>Download admin CSV</a>
+        <button id="admin-refresh" class="quiet-button"><span data-icon="refresh"></span>Refresh</button>
+      </div>
+      <div id="review-list"></div>
+    </section>
+  </main>
+  <script type="module" src="/src/admin.ts"></script>
+</body>
+</html>
