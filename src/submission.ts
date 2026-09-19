@@ -27,11 +27,38 @@ let matchesEmail = false
 let checkVersion = 0
 let emailVersion = 0
 let checkTimer: ReturnType<typeof setTimeout>
-function profileFields(hidden: boolean) {
-  document.querySelectorAll<HTMLElement>('[data-profile-field]').forEach(label => {
-    label.hidden = hidden
-    label.querySelectorAll<HTMLInputElement | HTMLSelectElement>('input, select').forEach(input => input.disabled = hidden)
-  })
+const usernameStep = document.querySelector<HTMLFieldSetElement>('#username-step')!
+const profileStep = document.querySelector<HTMLFieldSetElement>('#profile-step')!
+const paymentStep = document.querySelector<HTMLFieldSetElement>('#payment-step')!
+const nextUsername = document.querySelector<HTMLButtonElement>('#username-next')!
+const back = document.querySelector<HTMLButtonElement>('#form-back')!
+let step: 'username' | 'profile' | 'payment' = 'username'
+function showStep(value: typeof step) {
+  step = value
+  usernameStep.hidden = value !== 'username'
+  profileStep.hidden = value !== 'profile'
+  profileStep.disabled = returning || value === 'username'
+  paymentStep.hidden = value !== 'payment'
+  paymentStep.disabled = value !== 'payment'
+  document.querySelector<HTMLElement>('.payment-panel')!.hidden = value !== 'payment'
+  document.querySelector<HTMLElement>('.consent')!.hidden = value !== 'payment'
+  ;(form.elements.namedItem('consent') as HTMLInputElement).disabled = value !== 'payment'
+  submit.hidden = value !== 'payment'
+  back.hidden = value === 'username'
+  detailsStep.classList.toggle('account-layout', value !== 'payment')
+  dialog.classList.toggle('account-dialog', value !== 'payment')
+  document.querySelector('#wizard-progress')!.textContent = value === 'username' ? 'Username → Profile → Payment' : value === 'profile' ? 'Username checked · Your profile → Payment' : 'Profile confirmed · Payment & review'
+  document.querySelector('#payment-account')!.textContent = returning ? `Adding to @${userId.value.trim().toLowerCase()}. Your saved name, photo or icon and social profile will be reused.` : `For @${userId.value.trim().toLowerCase()}. Scan to pay, then enter the amount and payment reference.`
+  message.textContent = ''
+  dialog.scrollTop = 0
+  if (value === 'username') userId.focus()
+  else if (value === 'profile') (form.elements.namedItem('name') as HTMLInputElement).focus()
+  else (form.elements.namedItem('amount') as HTMLInputElement).focus()
+}
+function accountNotice(title: string, copy: string, state = 'neutral') {
+  warning.dataset.state = state
+  warning.querySelector('.warning-title')!.textContent = title
+  document.querySelector('#existing-user-copy')!.textContent = copy
 }
 function setUserStatus(text: string, state = 'neutral') {
   userStatus.textContent = text
@@ -39,8 +66,9 @@ function setUserStatus(text: string, state = 'neutral') {
 }
 function resetUserCheck() {
   checkVersion++; clearTimeout(checkTimer)
-  warning.hidden = true; returning = false; matchesEmail = false
-  profileFields(false)
+  returning = false; matchesEmail = false
+  nextUsername.disabled = true
+  accountNotice('Choose your username', 'We’ll check whether it is available or belongs to your verified email.')
   setUserStatus('Letters, numbers, dots or underscores.')
 }
 function startEmail() {
@@ -49,40 +77,51 @@ function startEmail() {
   verificationMessage.textContent = ''; sendCode.textContent = 'Send code'
   emailStep.hidden = false; detailsStep.hidden = true
   dialog.classList.add('verifying-email'); dialog.setAttribute('aria-labelledby', 'email-step-title')
-  resetUserCheck(); emailInput.focus()
+  resetUserCheck(); showStep('username'); emailInput.focus()
 }
 async function verificationApi(action: string, body: object) {
   const response = await fetch(`/api/sponsorship?action=${action}`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) })
   const result = await response.json()
   if (!response.ok) {
-    if (result.code === 'EMAIL_VERIFICATION_REQUIRED') startEmail()
-    throw new Error(result.error || 'Please try again.')
+    throw Object.assign(new Error(result.error || 'Please try again.'), { code: result.code })
   }
   return result
 }
 async function checkUserId() {
   const version = ++checkVersion
   const id = userId.value.trim().toLowerCase()
-  if (!verification || !/^[a-z0-9._]{1,30}$/.test(id)) return false
+  if (!verification || !/^[a-z0-9._]{1,30}$/.test(id)) { nextUsername.disabled = true; accountNotice('Check your username', 'Use 1–30 letters, numbers, dots or underscores.', 'error'); return false }
+  nextUsername.disabled = true
   setUserStatus('Checking username…')
+  accountNotice('Checking username…', 'Please wait while we check your account.')
   try {
     const result = await verificationApi('check-verified-user', { user_id: id, email: verifiedEmail, verification, request_id: requestId })
     if (version !== checkVersion) return false
     returning = result.exists; matchesEmail = result.matchesEmail
-    warning.hidden = !returning; profileFields(returning)
-    document.querySelector('#existing-user-copy')!.textContent = matchesEmail
-      ? 'Your email matches this account. We’ll reuse its saved profile for this contribution.'
-      : 'This username belongs to a different email. Change email above and verify the saved address, or choose another username.'
+    nextUsername.disabled = returning && !matchesEmail
+    nextUsername.textContent = returning && matchesEmail ? 'Continue with saved profile' : 'Continue'
+    accountNotice(returning ? matchesEmail ? 'Welcome back — your account is verified' : 'This username belongs to another email' : 'This username is available',
+      returning ? matchesEmail ? 'Your saved profile will be reused. Continue to enter a new contribution.' : 'Choose a different username, or use Change email above to verify this account’s saved address. You cannot continue with this email.' : 'Continue to add your name and choose a profile icon or photo.',
+      returning && !matchesEmail ? 'error' : 'success')
     setUserStatus(returning ? matchesEmail ? 'Existing account verified.' : 'Username taken — email does not match.' : 'This username is available.', !returning || matchesEmail ? 'available' : 'taken')
     return !returning || matchesEmail
   } catch (error) {
-    if (emailStep.hidden && version === checkVersion) setUserStatus((error as Error).message, 'taken')
+    if (version !== checkVersion) return false
+    if ((error as { code?: string }).code === 'EMAIL_VERIFICATION_REQUIRED') startEmail()
+    if (emailStep.hidden && version === checkVersion) { setUserStatus('Could not check username.', 'taken'); accountNotice('Could not check username', (error as Error).message + ' Edit the username to retry.', 'error') }
     else if (!emailStep.hidden) verificationMessage.textContent = (error as Error).message
     return false
   }
 }
 userId.addEventListener('input', () => { resetUserCheck(); checkTimer = setTimeout(() => void checkUserId(), 400) })
-userId.addEventListener('blur', () => { clearTimeout(checkTimer); void checkUserId() })
+nextUsername.addEventListener('click', () => {
+  if (nextUsername.disabled) return
+  showStep(returning && matchesEmail ? 'payment' : 'profile')
+})
+document.querySelector('#profile-next')!.addEventListener('click', () => {
+  if (form.reportValidity()) showStep('payment')
+})
+back.addEventListener('click', () => showStep(step === 'payment' && !returning ? 'profile' : 'username'))
 emailInput.addEventListener('input', startEmail)
 document.querySelector('#change-email')!.addEventListener('click', startEmail)
 sendCode.addEventListener('click', async () => {
@@ -112,7 +151,7 @@ emailForm.addEventListener('submit', async event => {
     emailStep.hidden = true; detailsStep.hidden = false
     dialog.classList.remove('verifying-email'); dialog.setAttribute('aria-labelledby', 'sponsor-dialog-title')
     document.querySelector('#verified-email-label')!.textContent = `Verified · ${verifiedEmail}`
-    message.textContent = ''; userId.focus()
+    showStep('username')
     if (userId.value) void checkUserId()
   } catch (error) { if (activeChallenge === challenge) verificationMessage.textContent = (error as Error).message }
   finally { verifyCode.disabled = false }
@@ -148,13 +187,16 @@ dialog.addEventListener('click', event => { if (event.target === dialog) {
 form.addEventListener('submit', async event => {
   event.preventDefault()
   if (submit.disabled) return
+  if (step === 'username') { nextUsername.click(); return }
+  if (step === 'profile') { document.querySelector<HTMLButtonElement>('#profile-next')!.click(); return }
   if (!form.reportValidity()) return
   submit.disabled = true
+  form.inert = true
   submit.textContent = 'Sending…'
   message.textContent = ''
   try {
     clearTimeout(checkTimer)
-    if (!await checkUserId()) throw new Error('Please check your username and try again.')
+    if (!await checkUserId()) { if (emailStep.hidden) showStep('username'); throw new Error('Please resolve the username warning before continuing.') }
     if (!verification || (returning && !matchesEmail)) throw new Error('Verify your saved email before sending this contribution.')
     if (!form.reportValidity()) return
     const data = new FormData(form)
@@ -196,6 +238,7 @@ form.addEventListener('submit', async event => {
   } catch (error) {
     message.textContent = error instanceof Error ? error.message : 'Could not submit. Please try again.'
   } finally {
+    form.inert = false
     submit.disabled = false
     submit.textContent = 'Send for review'
   }

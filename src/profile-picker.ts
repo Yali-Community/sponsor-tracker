@@ -5,7 +5,6 @@ export function profilePicker(form: HTMLFormElement) {
   const icon = form.elements.namedItem('avatar_icon') as HTMLInputElement
   const name = form.elements.namedItem('name') as HTMLInputElement
   const username = form.elements.namedItem('user_id') as HTMLInputElement
-  const amount = form.elements.namedItem('amount') as HTMLInputElement
   const preview = document.querySelector<HTMLImageElement>('#profile-preview-image')!
   const feedback = document.querySelector('#photo-feedback')!
   const remove = document.querySelector<HTMLButtonElement>('#remove-profile-photo')!
@@ -51,10 +50,6 @@ export function profilePicker(form: HTMLFormElement) {
     document.querySelector('#profile-preview-handle')!.textContent = '@' + (username.value.trim().toLowerCase() || 'yourname')
   }
   name.addEventListener('input', identity); username.addEventListener('input', identity)
-  const amounts = [...form.querySelectorAll<HTMLButtonElement>('[data-amount]')]
-  function syncAmounts() { amounts.forEach(button => button.setAttribute('aria-pressed', String(amount.value !== '' && Number(amount.value) === Number(button.dataset.amount)))) }
-  amounts.forEach(button => button.addEventListener('click', () => { amount.value = button.dataset.amount!; amount.dispatchEvent(new Event('input', { bubbles: true })) }))
-  amount.addEventListener('input', syncAmounts)
   update(); identity()
-  return { reset() { update(); identity(); syncAmounts() } }
+  return { reset() { update(); identity() } }
 }

@@ -31,10 +31,6 @@ p, h1, h2, h3 { margin: 0; }
 .social-fields { display: grid; gap: 12px; }
 .social-fields select { width: 100%; border: 1px solid #d6c8cc; border-radius: 6px; padding: 12px; background: #fff; color: #392e33; font: inherit; }
 .social-fields select:focus-visible { outline: 2px solid #a84664; outline-offset: 3px; }
-.amount-choices { display: flex; gap: 6px; margin-top: 8px; }
-.amount-choices button { border: 1px solid var(--line); background: transparent; border-radius: 20px; padding: 7px 10px; font-size: 11px; min-height: 34px; }
-.amount-choices button:hover { border-color: #a84664; }
-.amount-choices button[aria-pressed=true] { background: #f4e5e8; border-color: #a84664; color: #852e49; }
 .profile-picker { border-top: 1px solid var(--line); padding-top: 22px; margin-top: 4px; }
 .profile-picker-heading h4 { margin: 0; font-size: 16px; font-weight: 600; }
 .profile-picker-heading p { color: var(--muted); font-size: 12px; line-height: 1.7; margin-top: 5px; }
@@ -175,6 +171,25 @@ dialog[open] { animation: arrive 250ms var(--ease); }
 .lucide { flex-shrink: 0; }
 .icon-label, .primary-button, .quiet-button { display: inline-flex; align-items: center; justify-content: center; gap: 8px; }
 .donation-layout { display: grid; grid-template-columns: 260px minmax(0, 1fr); gap: 36px; }
+.donation-layout.account-layout { grid-template-columns: minmax(0, 560px); justify-content: center; }
+dialog.account-dialog:not(.verifying-email) { width: min(640px, calc(100% - 32px)); }
+.wizard-step { border: 0; padding: 0; margin: 0; min-width: 0; }
+.wizard-step legend { font-size: 20px; font-weight: 600; padding: 0; margin-bottom: 12px; }
+.wizard-step > label { display: grid; gap: 8px; font-size: 13px; }
+.wizard-step small { color: var(--muted); font-size: 11px; }
+.wizard-progress { font-size: 12px; color: var(--muted); border-bottom: 1px solid var(--line); padding-bottom: 18px; margin-bottom: 24px; }
+.step-copy { font-size: 13px; color: var(--muted); line-height: 1.7; margin-bottom: 20px; }
+#username-step .existing-user-warning { display: flex; flex-direction: column; justify-content: center; min-height: 148px; margin: 18px 0; background: #f4ece9; color: #59444f; border-color: var(--line); }
+#username-step .existing-user-warning[data-state=success] { color: #27633d; border-color: #a5cbb0; background: #f2faf4; }
+#username-step .existing-user-warning[data-state=error] { color: #852e39; border-color: #dfa7ab; background: #fff0ef; }
+#username-step .warning-title { margin: 0 0 6px; }
+#profile-next { margin-top: 24px; }
+#form-back { margin: 18px 12px 0 0; }
+#username-step label[data-id-state=available] input { border-color: #398151; }
+#username-step label[data-id-state=taken] input { border-color: #b65360; }
+@media (max-width: 700px) {
+  #username-step .existing-user-warning { min-height: 230px; }
+}
 .payment-panel { align-self: start; }
 .payment-qr { display: block; width: 100%; height: auto; background: #fff; }
 .mobile-upi { display: none; margin-top: 16px; text-align: center; }
