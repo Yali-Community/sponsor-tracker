@@ -124,7 +124,7 @@ export default async function handler(req: Request, res: ServerResponse) {
       }
       const account = current.find(record => record.user_id.toLowerCase() === userId)
       requireEmailVerification(input.verification, input.request_id, account?.email || normalizedEmail(input.email))
-      const submission = validateSubmission(account ? { ...input, name: account.name, email: account.email, social_id: account.social_id, photo: '' } : { ...input, social_id: socialLink(input.social_platform, input.social_id) })
+      const submission = validateSubmission(account ? { ...input, name: account.name, email: account.email, social_id: account.social_id, avatar_icon: account.avatar_icon || '', photo: '' } : { ...input, social_id: socialLink(input.social_platform, input.social_id), avatar_icon: input.avatar_icon ?? 'heart' })
       let photoPath = ''
       let saved = false
       try {
@@ -141,6 +141,7 @@ export default async function handler(req: Request, res: ServerResponse) {
           photo_path: account?.photo_path || photoPath, photo_type: account?.photo_type || submission.photo?.type || '', status: 'pending',
           submitted_at: submission.paid_at, reviewed_at: '', pending_email: '', decision_email: '',
           returning_user_verified: account ? 'yes' : '',
+          avatar_icon: submission.avatar_icon,
         }
         await updateRecords(records => {
           const latestAccount = records.find(item => item.user_id.toLowerCase() === record.user_id)
@@ -148,6 +149,7 @@ export default async function handler(req: Request, res: ServerResponse) {
           if (latestAccount) {
             requireEmailVerification(input.verification, record.request_id, latestAccount.email)
             for (const key of ['name', 'email', 'social_id', 'photo_path', 'photo_type'] as const) record[key] = latestAccount[key]
+            record.avatar_icon = latestAccount.avatar_icon || ''
           }
           if (records.some(item => item.transaction_id.toLowerCase() === record.transaction_id.toLowerCase())) throw new HttpError(409, 'This payment reference has already been submitted.')
           checkSubmissionLimit(records, record.email)

@@ -2,6 +2,7 @@ import { get, put, BlobPreconditionFailedError } from '@vercel/blob'
 import Papa from 'papaparse'
 import { namespace, hash } from './security.ts'
 import { HttpError } from './validation.ts'
+import { avatarIconUrl } from '../src/avatar-options.ts'
 
 export interface ReviewRecord {
   request_id: string
@@ -21,8 +22,9 @@ export interface ReviewRecord {
   pending_email: string
   decision_email: string
   returning_user_verified?: string
+  avatar_icon?: string
 }
-export const reviewFields = ['request_id','user_id','name','email','social_id','amount','paid_at','transaction_id','notes','photo_path','photo_type','status','submitted_at','reviewed_at','pending_email','decision_email','returning_user_verified']
+export const reviewFields = ['request_id','user_id','name','email','social_id','amount','paid_at','transaction_id','notes','photo_path','photo_type','status','submitted_at','reviewed_at','pending_email','decision_email','returning_user_verified','avatar_icon']
 export function csvFor(records: ReviewRecord[], exportForExcel = false) {
   return Papa.unparse({ fields: reviewFields, data: records }, { escapeFormulae: exportForExcel })
 }
@@ -37,7 +39,7 @@ export async function readRecords() {
   if (blob.statusCode !== 200) throw new Error('Unexpected storage response')
   const csv = await new Response(blob.stream).text()
   const parsed = Papa.parse<ReviewRecord>(csv, { header: true, skipEmptyLines: true })
-  if (parsed.errors.length || reviewFields.filter(field => field !== 'returning_user_verified').some(field => !parsed.meta.fields?.includes(field))) throw new Error('Invalid private review CSV')
+  if (parsed.errors.length || reviewFields.filter(field => !['returning_user_verified', 'avatar_icon'].includes(field)).some(field => !parsed.meta.fields?.includes(field))) throw new Error('Invalid private review CSV')
   return { records: parsed.data, etag: blob.blob.etag }
 }
 export async function updateRecords<T>(change: (records: ReviewRecord[]) => T): Promise<T> {
@@ -74,7 +76,7 @@ export function publicRecord(record: ReviewRecord) {
   return {
     user_id: record.user_id, name: record.name, social_id: record.social_id,
     amount: Number(record.amount), paid_at: record.submitted_at, notes: record.notes,
-    profile_picture: record.photo_path ? `/api/sponsorship?action=photo&id=${record.request_id}` : '',
+    profile_picture: record.photo_path ? `/api/sponsorship?action=photo&id=${record.request_id}` : avatarIconUrl(record.avatar_icon),
     transaction_id: '',
   }
 }

@@ -1,10 +1,12 @@
 import { userManager } from './admin-users'
+import { avatarIconUrl } from './avatar-options'
 import '@fontsource/manrope/latin-400.css'
 import '@fontsource/manrope/latin-600.css'
 import './style.css'
 
 export interface Review {
   version: string
+  avatar_icon?: string
   request_id: string; name: string; user_id: string; email: string; social_id: string
   amount: string; submitted_at: string; transaction_id: string; notes: string; photo_path: string
   status: 'pending' | 'approved' | 'rejected' | 'revoked'; pending_email: string; decision_email: string
@@ -71,9 +73,9 @@ function render() {
   for (const record of filtered) {
     const article = node('article', '', 'review-entry')
     const heading = node('div', '', 'review-heading')
-    if (record.photo_path) {
+    if (record.photo_path || avatarIconUrl(record.avatar_icon)) {
       const image = document.createElement('img')
-      image.src = `/api/sponsorship?action=photo&id=${encodeURIComponent(record.request_id)}`
+      image.src = record.photo_path ? `/api/sponsorship?action=photo&id=${encodeURIComponent(record.request_id)}` : avatarIconUrl(record.avatar_icon)
       image.alt = `${record.name}'s submitted profile photo`
       image.width = 56; image.height = 56
       heading.append(image)

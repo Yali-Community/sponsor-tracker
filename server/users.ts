@@ -3,7 +3,7 @@ import { hash } from './security.ts'
 import { deliveryInProgress } from './notifications.ts'
 import { HttpError, validateSubmission } from './validation.ts'
 
-const profileFields = ['user_id', 'name', 'email', 'social_id', 'photo_path', 'photo_type'] as const
+const profileFields = ['user_id', 'name', 'email', 'social_id', 'photo_path', 'photo_type', 'avatar_icon'] as const
 export function userVersion(record: ReviewRecord) {
   return hash(JSON.stringify(profileFields.map(key => record[key])))
 }
@@ -19,6 +19,7 @@ export function adminUsers(records: ReviewRecord[]) {
     return {
       request_id: first.request_id, user_id: first.user_id, name: first.name, email: first.email,
       social_id: first.social_id, photo_path: first.photo_path, version: userVersion(first),
+      avatar_icon: first.avatar_icon || '',
       contributions: group.length,
       approved_amount: group.filter(row => row.status === 'approved').reduce((cents, row) => cents + Math.round(Number(row.amount) * 100), 0) / 100,
     }
@@ -36,7 +37,7 @@ export function editUser(records: ReviewRecord[], input: Record<string, unknown>
   if (input.version !== userVersion(group[0])) throw new HttpError(409, 'This profile changed. Close the editor and refresh before editing again.')
   group.forEach(editable)
   const validated = validateSubmission({ ...anchor, user_id: input.user_id, name: input.name, email: input.email,
-    social_id: input.social_id, photo: input.photo, consent: true })
+    social_id: input.social_id, photo: input.photo, avatar_icon: input.avatar_icon ?? anchor.avatar_icon ?? '', consent: true })
   if (records.some(row => !group.includes(row) && row.user_id.toLowerCase() === validated.user_id)) {
     throw new HttpError(409, 'This username belongs to another user. Choose a different username.')
   }
@@ -44,6 +45,7 @@ export function editUser(records: ReviewRecord[], input: Record<string, unknown>
     for (const key of ['user_id', 'name', 'email', 'social_id'] as const) row[key] = validated[key]
     row.photo_path = photoPath || (input.remove_photo === true ? '' : anchor.photo_path)
     row.photo_type = photoPath ? validated.photo!.type : input.remove_photo === true ? '' : anchor.photo_type
+    row.avatar_icon = validated.avatar_icon
   }
   return validated
 }

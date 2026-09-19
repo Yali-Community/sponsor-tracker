@@ -5,7 +5,7 @@ A TypeScript + Vite sponsor wall with a QR payment form and private admin review
 ## How it works
 
 1. Click **Sponsor** and verify your email with a six-digit code. The details form and UPI QR open after verification. The query number at the top of the page links to **+91 8248777476**.
-2. Scan the QR or use the mobile UPI link, then enter your username and payment details. New users provide a name and optional profile photo. Choose Instagram, X / Twitter, or a custom HTTPS link for an optional social profile. Existing usernames must match the verified email; their saved profile fields are reused.
+2. Scan the QR or use the mobile UPI link, then enter your username and payment details. New users provide a name and can choose a pastel profile icon or upload an optional photo, with a live preview. After email verification, the form uses separate Username, Profile and Payment steps. Returning users skip profile entry after the saved email matches. Amounts are entered manually. Choose Instagram, X / Twitter, or a custom HTTPS link for an optional social profile. Existing usernames must match the verified email; their saved profile fields are reused.
 3. Submit for review. The server records the submission time automatically. The request is saved as **pending** and a confirmation email is sent.
 4. Open **/admin.html**, request an email sign-in link, and review the payment against your UPI account. Approve to publish or reject to keep it hidden. Approved contributions can be revoked with confirmation; they move to Revoked and leave the public wall and total without issuing a refund. The contributor receives a status email.
 5. The public page shows one profile per username with approved amounts combined, alongside individual contribution entries and their notes. It fetches approved entries on each page load. No rebuild is needed after approval.
@@ -65,3 +65,7 @@ The UI preserves the pastel palette, supplied logo, Tamil thank-you lines, keybo
 Open **All users** in admin to search every submitted username, including pending, rejected and revoked contributions. **Edit user** updates the name, username, email, social ID and profile photo across all contributions for that user. Username conflicts are blocked; changing the email invalidates verification proofs for the previous address. Photos can be replaced or removed.
 
 Expand **View contributions** to edit individual amounts, payment references and notes. Approved changes update the public wall and totals immediately. Submission/review timestamps remain system-managed; use the review queue to approve, reject or revoke. Concurrent edits are rejected with a refresh instruction, and edits wait while a status email is being sent. Profile corrections do not send extra emails.
+
+Profile icons are bundled Lucide SVGs, recorded in the optional `avatar_icon` CSV column. Older CSVs remain readable and keep initials when no photo or icon is saved. Uploaded photos take priority. Repeat contributions reuse the saved icon; admins can change it under All users.
+
+Username checks use a stable notice area: available or matching accounts show green, email mismatches show red and block Continue. Typing never hides or reveals profile fields; only explicit step navigation changes the layout. Late username responses are ignored, and Back preserves entered details.

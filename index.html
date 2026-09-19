@@ -26,7 +26,7 @@
           </div>
         </div>
         <button id="sponsor-button" class="sponsor-cta" type="button" aria-haspopup="dialog">
-          <span class="sponsor-label"><span data-icon="heart"></span>Sponsor</span><span id="sponsor-photos" class="cta-circles" aria-hidden="true" hidden></span>
+          <span class="sponsor-label"><span data-icon="heart"></span>Sponsor</span><span id="sponsor-photos" class="cta-circles" aria-hidden="true" hidden></span><span class="cta-arrow"><span data-icon="forward"></span></span>
         </button>
       </header>
       <div class="layout" id="sponsors-app">
@@ -48,7 +48,7 @@
         </form>
       </section>
       <div class="donation-layout" id="sponsorship-details" hidden>
-        <section class="payment-panel" aria-label="Scan to pay">
+        <section class="payment-panel" hidden aria-label="Scan to pay">
           <img src="/payment-qr.svg" class="payment-qr" alt="Scan to pay Mohan with any UPI app" width="260" height="260" />
           <div class="mobile-upi">
             <a class="primary-button" href="upi://pay?pa=mohn08052006%40okicici&amp;pn=Mohan&amp;cu=INR&amp;tn=Yali%20sponsorship"><span data-icon="phone"></span>Open UPI app</a>
@@ -56,27 +56,41 @@
           </div>
         </section>
         <section class="submission-panel">
-          <form id="sponsor-form">
+          <form id="sponsor-form" novalidate>
             <h3 id="sponsor-dialog-title">Your sponsorship</h3>
             <div class="verified-email"><span id="verified-email-label"></span><button type="button" id="change-email" class="text-link">Change email</button></div>
-            <p class="form-intro">Scan to pay, then send your details for review.</p>
-            <div class="form-fields">
+            <p class="form-intro">A few simple steps to support Yali.</p>
+            <p id="wizard-progress" class="wizard-progress">Username → Profile → Payment</p>
+            <fieldset id="username-step" class="wizard-step"><legend>Find your profile</legend><p class="step-copy">Choose a new username, or enter yours to sponsor again.</p>
               <label class="full-width">Username<input name="user_id" placeholder="john.doe" pattern="[a-zA-Z0-9._]{1,30}" maxlength="30" autocomplete="username" aria-describedby="user-id-status" required /><small id="user-id-status" role="status">Letters, numbers, dots or underscores.</small></label>
-              <div id="existing-user-warning" class="existing-user-warning full-width" hidden>
-                <p class="warning-title"><span data-icon="warning"></span>Username already exists</p>
+              <div id="existing-user-warning" class="existing-user-warning full-width" role="status" aria-live="polite" aria-atomic="true">
+                <p class="warning-title"><span data-icon="warning"></span>Choose your username</p>
                 <p id="existing-user-copy"></p>
               </div>
+              <button id="username-next" type="button" class="primary-button">Continue</button>
+            </fieldset>
+            <fieldset id="profile-step" class="wizard-step" hidden disabled><legend>Your public profile</legend><div class="form-fields">
               <label data-profile-field>Name<input name="name" autocomplete="name" maxlength="80" required /></label>
-              <label>Amount (₹)<input name="amount" type="number" min="0.01" max="1000000" step="0.01" inputmode="decimal" required /></label>
-              <label class="full-width">UPI transaction ID<input name="transaction_id" maxlength="100" required /><small>Your payment reference, visible only to the admin.</small></label>
               <div class="social-fields full-width" data-profile-field><label>Social profile <span>(optional)</span><select name="social_platform"><option value="instagram">Instagram</option><option value="twitter">X / Twitter</option><option value="custom">Custom link</option></select></label><label><span id="social-input-label">Handle or profile link</span><input name="social_id" maxlength="100" placeholder="@yourname or https://instagram.com/yourname" /></label></div>
-              <label class="full-width" data-profile-field>Profile photo <span>(optional)</span><input name="photo" type="file" accept="image/png,image/jpeg" /><small>PNG or JPEG, up to 1 MB. Initials are used if omitted.</small></label>
+              <section class="profile-picker full-width" data-profile-field aria-labelledby="profile-picker-title">
+                <div class="profile-picker-heading"><div><h4 id="profile-picker-title">Make it yours</h4><p>Pick an icon or add a photo. This is how you’ll appear.</p></div></div>
+                <div class="profile-preview"><img id="profile-preview-image" src="/avatars/heart.svg" width="64" height="64" alt="Selected profile icon" /><div><strong id="profile-preview-name">Your name</strong><span id="profile-preview-handle">@yourname</span></div></div>
+                <input name="avatar_icon" type="hidden" value="heart" />
+                <div id="avatar-choices" class="avatar-choices" role="group" aria-label="Choose a profile icon"></div>
+                <div class="photo-actions"><label class="photo-upload" for="profile-photo"><span data-icon="upload"></span>Upload your photo<input id="profile-photo" class="accessible-file" name="photo" type="file" accept="image/png,image/jpeg" /></label><button id="remove-profile-photo" type="button" class="text-link" hidden>Use icon instead</button></div>
+                <p id="photo-feedback" role="status">No photo needed. Your selected icon will appear after approval.</p><small>Optional photo: PNG or JPEG, up to 1 MB.</small>
+              </section>
+            </div><button id="profile-next" type="button" class="primary-button">Continue to payment</button></fieldset>
+            <fieldset id="payment-step" class="wizard-step" hidden disabled><legend>Your contribution</legend><p id="payment-account" class="step-copy"></p><div class="form-fields">
+              <label class="full-width">Amount (₹)<input name="amount" type="number" min="0.01" max="1000000" step="0.01" inputmode="decimal" placeholder="Enter your amount" required /></label>
+              <label class="full-width">UPI transaction ID<input name="transaction_id" maxlength="100" required /><small>Your payment reference, visible only to the admin.</small></label>
               <label class="full-width">Note <span>(optional)</span><textarea name="notes" rows="2" maxlength="500" placeholder="A few words of support…"></textarea></label>
-            </div>
+            </div></fieldset>
+            <button id="form-back" type="button" class="quiet-button" hidden>Back</button>
             <label class="honeypot" aria-hidden="true">Website<input name="website" tabindex="-1" autocomplete="off" /></label>
-            <label class="consent"><input name="consent" type="checkbox" required /><span>I agree to publish my name, username, social ID, photo, amount, submission time and note after approval. My email and payment reference stay private.</span></label>
+            <label class="consent" hidden><input name="consent" type="checkbox" required /><span>I agree to publish my name, username, social ID, photo or icon, amount, submission time and note after approval. My email and payment reference stay private.</span></label>
             <p id="form-message" class="form-message" role="alert"></p>
-            <button type="submit" class="primary-button">Send for review</button>
+            <button type="submit" class="primary-button submit-sponsorship" hidden>Send for review</button>
           </form>
           <div id="submission-success" class="submission-success" tabindex="-1" hidden>
             <h3>Your request is under review.</h3>
