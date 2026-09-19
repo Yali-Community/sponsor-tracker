@@ -21,7 +21,7 @@ export interface Submission {
   avatar_icon: string
   photo?: { bytes: Buffer; type: string; extension: string }
 }
-export function validateSubmission(input: Record<string, unknown>, now = Date.now()): Submission {
+export function validateSubmission(input: Record<string, unknown>, now = Date.now(), allowMissingEmail = false): Submission {
   function text(key: string, max: number, required = true) {
     const value = input[key]
     const label = key === 'user_id' ? 'username' : key.replaceAll('_', ' ')
@@ -34,8 +34,8 @@ export function validateSubmission(input: Record<string, unknown>, now = Date.no
   const user_id = text('user_id', 30).toLowerCase()
   if (!/^[a-z0-9._]{1,30}$/.test(user_id)) throw new HttpError(400, 'Use letters, numbers, dots or underscores for your username.')
   const name = text('name', 80)
-  const email = text('email', 254).toLowerCase()
-  if (!/^[^\s@<>]+@[^\s@<>]+\.[^\s@<>]+$/.test(email)) throw new HttpError(400, 'Enter a valid email address.')
+  const email = text('email', 254, !allowMissingEmail).toLowerCase()
+  if (email && !/^[^\s@<>]+@[^\s@<>]+\.[^\s@<>]+$/.test(email)) throw new HttpError(400, 'Enter a valid email address.')
   const amount = text('amount', 12)
   if (!/^\d+(\.\d{1,2})?$/.test(amount) || Number(amount) <= 0 || Number(amount) > 1000000) throw new HttpError(400, 'Enter an amount between ₹0.01 and ₹10,00,000.')
   const paid_at = new Date(now).toISOString()

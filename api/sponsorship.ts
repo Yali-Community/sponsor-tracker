@@ -6,6 +6,7 @@ import { readRecords, updateRecords, claimOnce, limit, csvFor, publicRecord, pub
 import { createSponsorChallenge, confirmSponsorCode } from '../server/sponsor-auth.ts'
 import { normalizedEmail, requireEmailVerification } from '../server/email-verification.ts'
 import { socialLink } from '../server/social.ts'
+import { addAdminContribution } from '../server/admin-entry.ts'
 import { checkSubmissionLimit } from '../server/submission-limit.ts'
 import { checkOrigin, requireAdmin, adminSession, signToken, verifyToken, namespace, hash } from '../server/security.ts'
 import { sendEmail } from '../server/email.ts'
@@ -80,7 +81,7 @@ export default async function handler(req: Request, res: ServerResponse) {
       const userId = typeof input.user_id === 'string' ? input.user_id.trim().toLowerCase() : ''
       if (!/^[a-z0-9._]{1,30}$/.test(userId)) throw new HttpError(400, 'Enter a valid username.')
       const account = (await readRecords()).records.find(row => row.user_id.toLowerCase() === userId)
-      return json(res, 200, { exists: Boolean(account), matchesEmail: !account || account.email === email })
+      return json(res, 200, { exists: Boolean(account), matchesEmail: !account || account.email === email, needsAdminEmail: Boolean(account && !account.email) })
     }
     if (action === 'verify-sponsor-code') {
       const challenge = typeof input.challenge === 'string' ? input.challenge : ''
@@ -169,6 +170,7 @@ export default async function handler(req: Request, res: ServerResponse) {
       }
     }
     requireAdmin(req.headers.cookie)
+    if (action === 'admin-add') return json(res, 200, await updateRecords(records => addAdminContribution(records, input)))
     if (action === 'edit-user') {
       let photoPath = ''
       try {

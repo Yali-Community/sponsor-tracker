@@ -23,8 +23,9 @@ export interface ReviewRecord {
   decision_email: string
   returning_user_verified?: string
   avatar_icon?: string
+  entry_source?: string
 }
-export const reviewFields = ['request_id','user_id','name','email','social_id','amount','paid_at','transaction_id','notes','photo_path','photo_type','status','submitted_at','reviewed_at','pending_email','decision_email','returning_user_verified','avatar_icon']
+export const reviewFields = ['request_id','user_id','name','email','social_id','amount','paid_at','transaction_id','notes','photo_path','photo_type','status','submitted_at','reviewed_at','pending_email','decision_email','returning_user_verified','avatar_icon','entry_source']
 export function csvFor(records: ReviewRecord[], exportForExcel = false) {
   return Papa.unparse({ fields: reviewFields, data: records }, { escapeFormulae: exportForExcel })
 }
@@ -39,7 +40,7 @@ export async function readRecords() {
   if (blob.statusCode !== 200) throw new Error('Unexpected storage response')
   const csv = await new Response(blob.stream).text()
   const parsed = Papa.parse<ReviewRecord>(csv, { header: true, skipEmptyLines: true })
-  if (parsed.errors.length || reviewFields.filter(field => !['returning_user_verified', 'avatar_icon'].includes(field)).some(field => !parsed.meta.fields?.includes(field))) throw new Error('Invalid private review CSV')
+  if (parsed.errors.length || reviewFields.filter(field => !['returning_user_verified', 'avatar_icon', 'entry_source'].includes(field)).some(field => !parsed.meta.fields?.includes(field))) throw new Error('Invalid private review CSV')
   return { records: parsed.data, etag: blob.blob.etag }
 }
 export async function updateRecords<T>(change: (records: ReviewRecord[]) => T): Promise<T> {

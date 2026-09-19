@@ -12,6 +12,7 @@ export async function notify(record: ReviewRecord, field: 'pending_email' | 'dec
     const state = await dependencies.updateRecords(records => {
       const current = records.find(item => item.request_id === record.request_id)
       if (!current || current.status !== record.status) return 'skip'
+      if (!current.email) { current[field] = 'not_required'; return 'skip' }
       if (current[field] === 'sent') return 'sent'
       if (deliveryInProgress(current[field])) return 'skip'
       current[field] = claim
