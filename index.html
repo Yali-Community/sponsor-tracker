@@ -26,7 +26,7 @@
           </div>
         </div>
         <button id="sponsor-button" class="sponsor-cta" type="button" aria-haspopup="dialog">
-          <span class="sponsor-label"><span data-icon="heart"></span>Sponsor</span><span id="sponsor-photos" class="cta-circles" aria-hidden="true" hidden></span>
+          <span class="sponsor-label"><span data-icon="heart"></span>Sponsor</span><span id="sponsor-photos" class="cta-circles" aria-hidden="true" hidden></span><span class="cta-arrow"><span data-icon="forward"></span></span>
         </button>
       </header>
       <div class="layout" id="sponsors-app">
@@ -67,16 +67,23 @@
                 <p id="existing-user-copy"></p>
               </div>
               <label data-profile-field>Name<input name="name" autocomplete="name" maxlength="80" required /></label>
-              <label>Amount (₹)<input name="amount" type="number" min="0.01" max="1000000" step="0.01" inputmode="decimal" required /></label>
+              <div class="amount-field"><label>Amount (₹)<input name="amount" type="number" min="0.01" max="1000000" step="0.01" inputmode="decimal" placeholder="Your amount" required /></label><div class="amount-choices" role="group" aria-label="Quick amounts"><button type="button" data-amount="100" aria-pressed="false">₹100</button><button type="button" data-amount="500" aria-pressed="false">₹500</button><button type="button" data-amount="1000" aria-pressed="false">₹1,000</button></div></div>
               <label class="full-width">UPI transaction ID<input name="transaction_id" maxlength="100" required /><small>Your payment reference, visible only to the admin.</small></label>
               <div class="social-fields full-width" data-profile-field><label>Social profile <span>(optional)</span><select name="social_platform"><option value="instagram">Instagram</option><option value="twitter">X / Twitter</option><option value="custom">Custom link</option></select></label><label><span id="social-input-label">Handle or profile link</span><input name="social_id" maxlength="100" placeholder="@yourname or https://instagram.com/yourname" /></label></div>
-              <label class="full-width" data-profile-field>Profile photo <span>(optional)</span><input name="photo" type="file" accept="image/png,image/jpeg" /><small>PNG or JPEG, up to 1 MB. Initials are used if omitted.</small></label>
+              <section class="profile-picker full-width" data-profile-field aria-labelledby="profile-picker-title">
+                <div class="profile-picker-heading"><div><h4 id="profile-picker-title">Make it yours</h4><p>Pick an icon or add a photo. This is how you’ll appear.</p></div></div>
+                <div class="profile-preview"><img id="profile-preview-image" src="/avatars/heart.svg" width="64" height="64" alt="Selected profile icon" /><div><strong id="profile-preview-name">Your name</strong><span id="profile-preview-handle">@yourname</span></div></div>
+                <input name="avatar_icon" type="hidden" value="heart" />
+                <div id="avatar-choices" class="avatar-choices" role="group" aria-label="Choose a profile icon"></div>
+                <div class="photo-actions"><label class="photo-upload" for="profile-photo"><span data-icon="upload"></span>Upload your photo<input id="profile-photo" class="accessible-file" name="photo" type="file" accept="image/png,image/jpeg" /></label><button id="remove-profile-photo" type="button" class="text-link" hidden>Use icon instead</button></div>
+                <p id="photo-feedback" role="status">No photo needed. Your selected icon will appear after approval.</p><small>Optional photo: PNG or JPEG, up to 1 MB.</small>
+              </section>
               <label class="full-width">Note <span>(optional)</span><textarea name="notes" rows="2" maxlength="500" placeholder="A few words of support…"></textarea></label>
             </div>
             <label class="honeypot" aria-hidden="true">Website<input name="website" tabindex="-1" autocomplete="off" /></label>
-            <label class="consent"><input name="consent" type="checkbox" required /><span>I agree to publish my name, username, social ID, photo, amount, submission time and note after approval. My email and payment reference stay private.</span></label>
+            <label class="consent"><input name="consent" type="checkbox" required /><span>I agree to publish my name, username, social ID, photo or icon, amount, submission time and note after approval. My email and payment reference stay private.</span></label>
             <p id="form-message" class="form-message" role="alert"></p>
-            <button type="submit" class="primary-button">Send for review</button>
+            <button type="submit" class="primary-button submit-sponsorship">Send for review</button>
           </form>
           <div id="submission-success" class="submission-success" tabindex="-1" hidden>
             <h3>Your request is under review.</h3>

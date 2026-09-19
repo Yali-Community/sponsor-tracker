@@ -1,8 +1,10 @@
+import { profilePicker } from './profile-picker'
 const dialog = document.querySelector<HTMLDialogElement>('#sponsor-dialog')!
 const form = document.querySelector<HTMLFormElement>('#sponsor-form')!
 const message = document.querySelector<HTMLParagraphElement>('#form-message')!
 const submit = form.querySelector<HTMLButtonElement>('button[type=submit]')!
 const success = document.querySelector<HTMLElement>('#submission-success')!
+const picker = profilePicker(form)
 let requestId = crypto.randomUUID()
 let completed = false
 const userId = form.elements.namedItem('user_id') as HTMLInputElement
@@ -129,6 +131,7 @@ document.querySelector('#sponsor-button')!.addEventListener('click', () => {
     completed = false
     requestId = crypto.randomUUID()
     form.reset()
+    picker.reset()
     startEmail()
     socialPlatform.dispatchEvent(new Event('change'))
     form.hidden = false
@@ -172,7 +175,7 @@ form.addEventListener('submit', async event => {
       social_platform: data.get('social_platform'), social_id: data.get('social_id'), amount: data.get('amount'),
       transaction_id: data.get('transaction_id'), notes: data.get('notes'),
       consent: data.get('consent') === 'on', website: data.get('website'), photo: photoData,
-      verification,
+      avatar_icon: data.get('avatar_icon'), verification,
     }
     const response = await fetch('/api/sponsorship?action=submit', {
       method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload),

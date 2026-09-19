@@ -1,3 +1,5 @@
+import { avatarIconUrl } from '../src/avatar-options.ts'
+
 export class HttpError extends Error {
   status: number
   code?: string
@@ -16,6 +18,7 @@ export interface Submission {
   paid_at: string
   transaction_id: string
   notes: string
+  avatar_icon: string
   photo?: { bytes: Buffer; type: string; extension: string }
 }
 export function validateSubmission(input: Record<string, unknown>, now = Date.now()): Submission {
@@ -41,6 +44,8 @@ export function validateSubmission(input: Record<string, unknown>, now = Date.no
   if (input.consent !== true) throw new HttpError(400, 'Please agree to publish your sponsor details after approval.')
   if (input.website) throw new HttpError(400, 'Unable to submit this request.')
   let photo: Submission['photo']
+  const avatar_icon = input.avatar_icon ?? ''
+  if (typeof avatar_icon !== 'string' || (avatar_icon && !avatarIconUrl(avatar_icon))) throw new HttpError(400, 'Choose one of the profile icons.')
   if (input.photo) {
     if (typeof input.photo !== 'string' || input.photo.length > 1400000) throw new HttpError(400, 'Choose a PNG or JPEG photo under 1 MB.')
     const match = /^data:image\/(png|jpeg);base64,([A-Za-z0-9+/=]+)$/.exec(input.photo)
@@ -52,5 +57,5 @@ export function validateSubmission(input: Record<string, unknown>, now = Date.no
     photo = { bytes, type: `image/${match[1]}`, extension: match[1] === 'jpeg' ? 'jpg' : 'png' }
   }
   return { request_id, user_id, name, email, amount, paid_at, transaction_id,
-    social_id: text('social_id', 100, false), notes: text('notes', 500, false), photo }
+    social_id: text('social_id', 100, false), notes: text('notes', 500, false), avatar_icon, photo }
 }

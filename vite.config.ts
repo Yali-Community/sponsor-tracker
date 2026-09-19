@@ -1,9 +1,9 @@
 import { defineConfig } from 'vite'
 import { createElement } from 'react'
 import { renderToStaticMarkup } from 'react-dom/server'
-import { ArrowLeft, Download, LogOut, Mail, RotateCw, X, TriangleAlert, ShieldCheck, Search, Heart, Smartphone } from 'lucide-react'
+import { ArrowLeft, ArrowUpRight, Camera, Download, LogOut, Mail, RotateCw, X, TriangleAlert, ShieldCheck, Search, Heart, Smartphone } from 'lucide-react'
 
-const icons = { close: X, back: ArrowLeft, download: Download, logout: LogOut, mail: Mail, refresh: RotateCw, warning: TriangleAlert, shield: ShieldCheck, search: Search, heart: Heart, phone: Smartphone }
+const icons = { close: X, back: ArrowLeft, download: Download, logout: LogOut, mail: Mail, refresh: RotateCw, warning: TriangleAlert, shield: ShieldCheck, search: Search, heart: Heart, phone: Smartphone, forward: ArrowUpRight, upload: Camera }
 
 export default defineConfig({
   plugins: [{

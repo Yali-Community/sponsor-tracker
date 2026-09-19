@@ -1,8 +1,10 @@
 import type { Review } from './admin'
+import { avatarOptions, avatarIconUrl } from './avatar-options'
 
 interface User {
   request_id: string; user_id: string; name: string; email: string; social_id: string
   photo_path: string; version: string; contributions: number; approved_amount: number
+  avatar_icon?: string
 }
 const money = (amount: number | string) => new Intl.NumberFormat('en-IN', { style: 'currency', currency: 'INR' }).format(Number(amount))
 function element(tag: string, text = '', className = '') {
@@ -44,6 +46,15 @@ export function userManager(api: (action: string, data?: object) => Promise<any>
     field('Username', 'user_id', user.user_id, 'text', 30)
     field('Email', 'email', user.email, 'email', 254)
     field('Social ID (optional)', 'social_id', user.social_id, 'text', 100, false)
+    const iconLabel = element('label', 'Profile icon (used without a photo)')
+    const iconSelect = document.createElement('select')
+    iconSelect.name = 'avatar_icon'
+    for (const value of ['', ...avatarOptions]) {
+      const option = document.createElement('option'); option.value = value
+      option.textContent = value ? value[0].toUpperCase() + value.slice(1) : 'Initials'
+      iconSelect.append(option)
+    }
+    iconSelect.value = user.avatar_icon || ''; iconLabel.append(iconSelect); fields.append(iconLabel)
     const photo = field('Replace profile photo (optional)', 'photo', '', 'file', 100, false)
     photo.accept = 'image/png,image/jpeg'
     photo.parentElement!.append(element('small', 'PNG or JPEG, up to 1 MB. Leave empty to keep the current photo.'))
@@ -83,9 +94,9 @@ export function userManager(api: (action: string, data?: object) => Promise<any>
     for (const user of matching) {
       const row = element('article', '', 'user-row')
       const identity = element('div', '', 'user-identity')
-      if (user.photo_path) {
+      if (user.photo_path || avatarIconUrl(user.avatar_icon)) {
         const image = document.createElement('img')
-        image.src = `/api/sponsorship?action=photo&id=${encodeURIComponent(user.request_id)}&v=${user.version}`
+        image.src = user.photo_path ? `/api/sponsorship?action=photo&id=${encodeURIComponent(user.request_id)}&v=${user.version}` : avatarIconUrl(user.avatar_icon)
         image.alt = ''; image.width = 44; image.height = 44
         identity.append(image)
       } else identity.append(element('span', user.name.slice(0, 1), 'review-initials'))
