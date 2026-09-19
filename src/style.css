@@ -267,6 +267,19 @@ textarea { resize: vertical; }
 .admin-header .brand { gap: 14px; }
 .admin-header .brand img { object-fit: contain; }
 .admin-sections { display: flex; gap: 24px; margin-bottom: 24px; border-bottom: 1px solid var(--line); }
+.quick-entry { padding: 24px; margin-bottom: 28px; border: 1px solid var(--line); border-radius: 12px; background: #fffefd; }
+.quick-entry h3 { font-size: 18px; font-weight: 600; }
+.quick-entry p { font-size: 12px; color: var(--muted); line-height: 1.7; margin-top: 8px; }
+#quick-entry-form { display: grid; grid-template-columns: minmax(0, 1fr) minmax(130px, .6fr) auto; gap: 14px; align-items: end; margin-top: 20px; }
+#quick-entry-form label { display: grid; gap: 8px; font-size: 12px; }
+.quick-entry-hint { min-height: 42px; }
+#quick-entry-result { color: #392e33; }
+#quick-entry-result:empty { display: none; }
+@media (max-width: 700px) {
+  .quick-entry { padding: 18px; }
+  #quick-entry-form { grid-template-columns: minmax(0, 1fr); }
+  #quick-entry-form button { justify-self: start; }
+}
 .admin-sections button { background: none; border: 0; border-bottom: 2px solid transparent; padding: 12px 0; color: var(--muted); font-size: 15px; }
 .admin-sections button[aria-pressed=true] { border-bottom-color: var(--ink); color: var(--ink); font-weight: 600; }
 .admin-sections span { margin-left: 6px; font-size: 12px; }

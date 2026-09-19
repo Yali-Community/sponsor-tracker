@@ -103,6 +103,7 @@ async function checkUserId() {
     accountNotice(returning ? matchesEmail ? 'Welcome back — your account is verified' : 'This username belongs to another email' : 'This username is available',
       returning ? matchesEmail ? 'Your saved profile will be reused. Continue to enter a new contribution.' : 'Choose a different username, or use Change email above to verify this account’s saved address. You cannot continue with this email.' : 'Continue to add your name and choose a profile icon or photo.',
       returning && !matchesEmail ? 'error' : 'success')
+    if (result.needsAdminEmail) accountNotice('This profile needs an email added', 'This username was added by an admin. Contact +91 8248777476 to have your email added before sponsoring online under this username.', 'error')
     setUserStatus(returning ? matchesEmail ? 'Existing account verified.' : 'Username taken — email does not match.' : 'This username is available.', !returning || matchesEmail ? 'available' : 'taken')
     return !returning || matchesEmail
   } catch (error) {

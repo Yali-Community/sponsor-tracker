@@ -69,3 +69,9 @@ Expand **View contributions** to edit individual amounts, payment references and
 Profile icons are bundled Lucide SVGs, recorded in the optional `avatar_icon` CSV column. Older CSVs remain readable and keep initials when no photo or icon is saved. Uploaded photos take priority. Repeat contributions reuse the saved icon; admins can change it under All users.
 
 Username checks use a stable notice area: available or matching accounts show green, email mismatches show red and block Continue. Typing never hides or reveals profile fields; only explicit step navigation changes the layout. Late username responses are ignored, and Back preserves entered details.
+
+### Admin quick entry
+
+After signing in, use **Quick contribution** with only a username and amount, then **Add & publish** for a payment you have already checked. Entries are approved immediately and marked `entry_source=admin`, with an automatically generated internal reference (not a bank transaction ID). Repeated retries of the same entry do not add its amount twice. No email is sent when creating an admin entry.
+
+Existing usernames keep their saved profile. New usernames use the username as the display name and a heart icon; their email remains blank. Admins can edit the profile or add a real email in **All users**. Until an admin adds an email, the public form cannot claim that username. Admin entries support the usual edit and revoke controls.

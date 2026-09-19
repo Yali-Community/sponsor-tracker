@@ -3,7 +3,7 @@ import { test } from 'node:test'
 import { notify, deliveryInProgress } from '../server/notifications.ts'
 
 function fixture() {
-  const record = { request_id: 'test', status: 'pending', pending_email: '', decision_email: '' }
+  const record = { request_id: 'test', email: 'test@example.com', status: 'pending', pending_email: '', decision_email: '' }
   let sends = 0
   const dependencies = {
     updateRecords: async change => change([record]),

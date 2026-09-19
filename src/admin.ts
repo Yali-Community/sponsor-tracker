@@ -1,4 +1,5 @@
 import { userManager } from './admin-users'
+import { quickEntry } from './admin-quick-entry'
 import { avatarIconUrl } from './avatar-options'
 import '@fontsource/manrope/latin-400.css'
 import '@fontsource/manrope/latin-600.css'
@@ -7,6 +8,7 @@ import './style.css'
 export interface Review {
   version: string
   avatar_icon?: string
+  entry_source?: string
   request_id: string; name: string; user_id: string; email: string; social_id: string
   amount: string; submitted_at: string; transaction_id: string; notes: string; photo_path: string
   status: 'pending' | 'approved' | 'rejected' | 'revoked'; pending_email: string; decision_email: string
@@ -23,6 +25,7 @@ let records: Review[] = []
 let generation = 0
 let signingOut = false
 const users = userManager(api, load)
+const quick = quickEntry(api, load)
 
 function node(tag: string, text = '', className = '') {
   const element = document.createElement(tag)
@@ -36,7 +39,7 @@ async function api(action: string, data?: object) {
   } : undefined)
   const result = await response.json()
   if (!response.ok) {
-    if (response.status === 401) { generation++; login.hidden = false; content.hidden = true; records = []; list.replaceChildren(); users.clear() }
+    if (response.status === 401) { generation++; login.hidden = false; content.hidden = true; records = []; list.replaceChildren(); users.clear(); quick.clear() }
     throw new Error(result.error || 'Request failed.')
   }
   return result
@@ -49,6 +52,7 @@ async function load() {
     if (current !== generation) return
     records = incoming
     users.setData(incomingUsers, records)
+    quick.setRecords(records)
     login.hidden = true
     content.hidden = false
     render()
@@ -92,10 +96,10 @@ function render() {
     }
     const details = node('dl', '', 'review-details')
     for (const [label, value] of [
-      ['Email', record.email], ['Social ID', record.social_id || '—'],
-      ['Submitted at', new Date(record.submitted_at).toLocaleString()], ['Payment reference', record.transaction_id],
+      ['Email', record.email || 'Not provided — add in All users if needed'], ['Social ID', record.social_id || '—'],
+      ['Submitted at', new Date(record.submitted_at).toLocaleString()], [record.entry_source === 'admin' ? 'Admin entry reference' : 'Payment reference', record.transaction_id],
       ['Note', record.notes || '—'],
-      ['Email delivery', record.status === 'pending' ? record.pending_email || 'waiting' : record.decision_email || 'waiting'],
+      ['Email delivery', !record.email ? 'No email address added' : (record.status === 'pending' ? record.pending_email : record.decision_email) === 'not_required' ? 'Not sent for admin entry' : (record.status === 'pending' ? record.pending_email : record.decision_email) || 'waiting'],
     ]) details.append(node('dt', label), node('dd', value))
     article.append(details)
     const reference = node('details', '', 'review-reference')
@@ -109,7 +113,7 @@ function render() {
       status.textContent = 'Saving…'
       try {
         const result = await api(action, { request_id: record.request_id, ...(decision ? { status: decision } : {}) })
-        status.textContent = result.emailSent
+        status.textContent = !record.email ? 'Saved. No email address is recorded for this user.' : result.emailSent
           ? 'Saved. Email delivered.'
           : 'Saved. Email is in progress or needs a retry; refresh to check delivery.'
         await load()
@@ -131,7 +135,7 @@ function render() {
       actions.append(revoke)
     }
     const emailStatus = record.status === 'pending' ? record.pending_email : record.decision_email
-    if (emailStatus !== 'sent') {
+    if (record.email && emailStatus !== 'sent' && emailStatus !== 'not_required') {
       const retry = document.createElement('button')
       retry.textContent = 'Retry email'; retry.className = 'quiet-button'
       retry.addEventListener('click', () => void act('retry-email'))
@@ -161,7 +165,7 @@ document.querySelector('#admin-logout')!.addEventListener('click', async () => {
   try {
     await api('logout', {})
     generation++
-    records = []; list.replaceChildren(); users.clear(); login.hidden = false; content.hidden = true
+    records = []; list.replaceChildren(); users.clear(); quick.clear(); login.hidden = false; content.hidden = true
     status.textContent = 'Signed out.'
   } catch (error) { status.textContent = (error as Error).message }
   finally { signingOut = false }
