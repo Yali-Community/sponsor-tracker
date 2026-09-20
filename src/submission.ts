@@ -53,7 +53,10 @@ function showStep(value: typeof step) {
   dialog.scrollTop = 0
   if (value === 'username') userId.focus()
   else if (value === 'profile') (form.elements.namedItem('name') as HTMLInputElement).focus()
-  else (form.elements.namedItem('amount') as HTMLInputElement).focus()
+  else {
+    document.querySelector<HTMLElement>('.payment-panel')!.focus({ preventScroll: true })
+    dialog.scrollTop = 0
+  }
 }
 function accountNotice(title: string, copy: string, state = 'neutral') {
   warning.dataset.state = state
