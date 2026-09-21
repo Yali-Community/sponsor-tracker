@@ -12,7 +12,7 @@ import { checkOrigin, requireAdmin, adminSession, signToken, verifyToken, namesp
 import { sendEmail } from '../server/email.ts'
 import { notify } from '../server/notifications.ts'
 import { reviewRequest } from '../server/review.ts'
-import { adminUsers, editUser, editContribution, contributionVersion } from '../server/users.ts'
+import { adminUsers, editUser, editContribution, contributionVersion, deleteUser } from '../server/users.ts'
 
 type Request = IncomingMessage & { body?: unknown }
 function json(res: ServerResponse, status: number, value: unknown) {
@@ -170,6 +170,14 @@ export default async function handler(req: Request, res: ServerResponse) {
       }
     }
     requireAdmin(req.headers.cookie)
+    if (action === 'delete-user') {
+      const result = await updateRecords(records => deleteUser(records, input))
+      try {
+        const latest = (await readRecords()).records
+        for (const path of result.photos) if (!latest.some(row => row.photo_path === path)) await del(path)
+      } catch { /* Deleted profiles are inaccessible; unused image cleanup may be retried separately. */ }
+      return json(res, 200, { deleted: result.deleted })
+    }
     if (action === 'admin-add') return json(res, 200, await updateRecords(records => addAdminContribution(records, input)))
     if (action === 'edit-user') {
       let photoPath = ''

@@ -64,7 +64,7 @@ The UI preserves the pastel palette, supplied logo, Tamil thank-you lines, keybo
 
 Open **All users** in admin to search every submitted username, including pending, rejected and revoked contributions. **Edit user** updates the name, username, email, social ID and profile photo across all contributions for that user. Username conflicts are blocked; changing the email invalidates verification proofs for the previous address. Photos can be replaced or removed.
 
-Expand **View contributions** to edit individual amounts, payment references and notes. Approved changes update the public wall and totals immediately. Submission/review timestamps remain system-managed; use the review queue to approve, reject or revoke. Concurrent edits are rejected with a refresh instruction, and edits wait while a status email is being sent. Profile corrections do not send extra emails.
+Expand **View contributions & edit amounts** to edit individual amounts, payment references and notes. Approved changes update the public wall and totals immediately. Submission/review timestamps remain system-managed; use the review queue to approve, reject or revoke. Concurrent edits are rejected with a refresh instruction, and edits wait while a status email is being sent. Profile corrections do not send extra emails.
 
 Profile icons are bundled Lucide SVGs, recorded in the optional `avatar_icon` CSV column. Older CSVs remain readable and keep initials when no photo or icon is saved. Uploaded photos take priority. Repeat contributions reuse the saved icon; admins can change it under All users.
 
@@ -75,3 +75,9 @@ Username checks use a stable notice area: available or matching accounts show gr
 After signing in, use **Quick contribution** with only a username and amount, then **Add & publish** for a payment you have already checked. Entries are approved immediately and marked `entry_source=admin`, with an automatically generated internal reference (not a bank transaction ID). Repeated retries of the same entry do not add its amount twice. No email is sent when creating an admin entry.
 
 Existing usernames keep their saved profile. New usernames use the username as the display name and a heart icon; their email remains blank. Admins can edit the profile or add a real email in **All users**. Until an admin adds an email, the public form cannot claim that username. Admin entries support the usual edit and revoke controls.
+
+### Spending and user deletion
+
+Open **View spending** for expenses, totals, search and category filters. Follow [Google Sheets setup](integrations/README.md) to publish the sheet. Configure server-only `SPENDING_SYNC_SECRET`; the public script is a template and the separately supplied private copy contains the passcode.
+
+In **All users**, expand contributions and choose **Delete user & contributions**. Type the username to permanently remove the profile and all contributions, including approved amounts from public totals. This does not refund payments. Concurrent changes require a refresh before deletion.
