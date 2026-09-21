@@ -1,0 +1,23 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" /><meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="How Yali community contributions are spent." />
+  <title>Spending · Yali</title><link rel="icon" href="/heart.svg" type="image/svg+xml" />
+</head>
+<body>
+  <main class="page spending-page">
+    <header class="page-header"><div class="brand"><img src="/yali-logo.png" alt="Yali" width="56" height="56" /><h1>Spending</h1></div><a href="/" class="icon-label"><span data-icon="back"></span>Back to sponsors</a></header>
+    <section class="spending-intro"><div><h2>Where your support goes.</h2><p>A record of community expenses, published from our spending sheet.</p></div><button id="refresh-spending" class="quiet-button"><span data-icon="refresh"></span>Refresh</button></section>
+    <p id="spending-status" role="status">Loading spending…</p>
+    <section id="spending-content" hidden>
+      <div class="spending-overview"><div><span>Total spent</span><strong id="spending-total">₹0</strong></div><p id="spending-updated"></p></div>
+      <div class="spending-filters"><label>Search spending<input id="spending-search" type="search" placeholder="Description, category or note" /></label><label>Category<select id="spending-category"><option value="">All categories</option></select></label></div>
+      <p id="spending-count" role="status"></p>
+      <div class="spending-table-wrap"><table class="spending-table"><caption class="sr-only">Published community expenses</caption><thead><tr><th scope="col">Date</th><th scope="col">Expense</th><th scope="col">Amount</th></tr></thead><tbody id="spending-rows"></tbody></table></div>
+      <p id="spending-empty" class="review-empty" hidden>No spending published yet.</p>
+    </section>
+    <footer><span>Every contribution matters.</span><a href="/admin.html">Admin</a></footer>
+  </main><script type="module" src="/src/spending.ts"></script>
+</body>
+</html>

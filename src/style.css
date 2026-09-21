@@ -267,6 +267,36 @@ textarea { resize: vertical; }
 .admin-header .brand { gap: 14px; }
 .admin-header .brand img { object-fit: contain; }
 .admin-sections { display: flex; gap: 24px; margin-bottom: 24px; border-bottom: 1px solid var(--line); }
+.spending-page { max-width: 1060px; }
+.spending-page header a { font-size: 13px; text-decoration: none; }
+.spending-intro { display: flex; justify-content: space-between; align-items: center; gap: 20px; margin: 44px 0 32px; }
+.spending-intro h2 { font-size: clamp(24px, 4vw, 36px); font-weight: 600; letter-spacing: -0.03em; }
+.spending-intro p { font-size: 13px; line-height: 1.7; color: var(--muted); margin-top: 12px; max-width: 55ch; }
+.spending-overview { display: flex; justify-content: space-between; align-items: end; gap: 20px; border-block: 1px solid var(--line); padding: 28px 0; }
+.spending-overview span, .spending-overview p { display: block; font-size: 12px; color: var(--muted); line-height: 1.7; }
+.spending-overview strong { display: block; font-size: 38px; font-weight: 600; margin-top: 6px; font-variant-numeric: tabular-nums; }
+.spending-filters { display: grid; grid-template-columns: minmax(0, 1fr) minmax(130px, 220px); gap: 16px; margin-top: 28px; }
+.spending-filters label { display: grid; gap: 8px; font-size: 12px; }
+#spending-count { margin: 20px 0 12px; font-size: 12px; color: var(--muted); }
+.spending-table { width: 100%; border-collapse: collapse; table-layout: fixed; font-size: 13px; }
+.spending-table th { text-align: left; font-weight: 600; color: var(--muted); padding: 14px 0; border-bottom: 1px solid var(--line); }
+.spending-table td { padding: 22px 0; border-bottom: 1px solid var(--line); vertical-align: top; overflow-wrap: anywhere; }
+.spending-table th:first-child { width: 22%; }
+.spending-table th:last-child { width: 24%; }
+.spending-table td:last-child, .spending-table th:last-child { text-align: right; font-variant-numeric: tabular-nums; padding-left: 12px; }
+.spending-table td:first-child { padding-right: 12px; color: var(--muted); font-size: 12px; }
+.spending-table strong { font-weight: 600; }
+.expense-category { display: block; font-size: 11px; margin-top: 8px; color: #97445e; }
+.expense-note { color: var(--muted); font-size: 12px; line-height: 1.7; margin-top: 8px; }
+.sr-only { position: absolute; width: 1px; height: 1px; padding: 0; overflow: hidden; clip-path: inset(50%); }
+#spending-status:empty { display: none; }
+@media (max-width: 700px) {
+  .spending-intro { align-items: flex-start; }
+  .spending-overview { flex-direction: column; align-items: flex-start; gap: 12px; }
+  .spending-filters { grid-template-columns: minmax(0, 1fr); }
+  .spending-table th:first-child { width: 24%; }
+  .spending-table th:last-child { width: 29%; }
+}
 .quick-entry { padding: 24px; margin-bottom: 28px; border: 1px solid var(--line); border-radius: 12px; background: #fffefd; }
 .quick-entry h3 { font-size: 18px; font-weight: 600; }
 .quick-entry p { font-size: 12px; color: var(--muted); line-height: 1.7; margin-top: 8px; }

@@ -5,6 +5,7 @@ interface User {
   request_id: string; user_id: string; name: string; email: string; social_id: string
   photo_path: string; version: string; contributions: number; approved_amount: number
   avatar_icon?: string
+  delete_version: string
 }
 const money = (amount: number | string) => new Intl.NumberFormat('en-IN', { style: 'currency', currency: 'INR' }).format(Number(amount))
 function element(tag: string, text = '', className = '') {
@@ -110,15 +111,30 @@ export function userManager(api: (action: string, data?: object) => Promise<any>
       row.append(identity, contact, total, button('Edit user', () => editUser(user)))
       const history = document.createElement('details')
       history.className = 'user-history'
-      history.append(element('summary', 'View contributions'))
+      history.append(element('summary', 'View contributions & edit amounts'))
       for (const record of records.filter(record => record.user_id.toLowerCase() === user.user_id.toLowerCase()).sort((a, b) => b.submitted_at.localeCompare(a.submitted_at))) {
         const contribution = element('div', '', 'user-contribution')
         const info = element('div')
         info.append(element('strong', money(record.amount)), element('span', record.status, `review-badge ${record.status}`), element('p', `${new Date(record.submitted_at).toLocaleString()} · ${record.transaction_id}`))
         if (record.notes) info.append(element('p', record.notes))
-        contribution.append(info, button('Edit contribution', () => editContribution(record)))
+        contribution.append(info, button('Edit amount & details', () => editContribution(record)))
         history.append(contribution)
       }
+      const remove = button('Delete user & contributions', () => {
+        const confirmation = window.prompt(`Permanently delete @${user.user_id} and all ${user.contributions} contributions? ${money(user.approved_amount)} will be removed from the public total. This cannot be undone and does not refund payments. Type ${user.user_id} to confirm.`)
+        if (confirmation !== user.user_id) return
+        remove.disabled = true
+        void (async () => {
+          try {
+            await api('delete-user', { request_id: user.request_id, delete_version: user.delete_version, confirm_username: confirmation })
+            document.querySelector('#admin-message')!.textContent = `Deleted @${user.user_id} and their contributions.`
+            await reload()
+          } catch (failure) { document.querySelector('#admin-message')!.textContent = (failure as Error).message }
+          finally { remove.disabled = false }
+        })()
+      })
+      remove.classList.add('danger-button')
+      history.append(remove)
       row.append(history); list.append(row)
     }
   }

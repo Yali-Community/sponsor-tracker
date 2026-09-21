@@ -20,6 +20,7 @@ export function adminUsers(records: ReviewRecord[]) {
       request_id: first.request_id, user_id: first.user_id, name: first.name, email: first.email,
       social_id: first.social_id, photo_path: first.photo_path, version: userVersion(first),
       avatar_icon: first.avatar_icon || '',
+      delete_version: hash(JSON.stringify(group)),
       contributions: group.length,
       approved_amount: group.filter(row => row.status === 'approved').reduce((cents, row) => cents + Math.round(Number(row.amount) * 100), 0) / 100,
     }
@@ -50,6 +51,16 @@ export function editUser(records: ReviewRecord[], input: Record<string, unknown>
   return validated
 }
 export function contributionVersion(record: ReviewRecord) { return hash(JSON.stringify(record)) }
+export function deleteUser(records: ReviewRecord[], input: Record<string, unknown>) {
+  const anchor = records.find(row => row.request_id === input.request_id)
+  if (!anchor) throw new HttpError(404, 'User not found. Refresh the list.')
+  const group = records.filter(row => row.user_id.toLowerCase() === anchor.user_id.toLowerCase())
+  if (input.confirm_username !== anchor.user_id || input.delete_version !== hash(JSON.stringify(group))) throw new HttpError(409, 'The user or contributions changed. Refresh and confirm deletion again.')
+  group.forEach(editable)
+  const photos = [...new Set(group.map(row => row.photo_path).filter(Boolean))]
+  for (let i = records.length - 1; i >= 0; i--) if (group.includes(records[i])) records.splice(i, 1)
+  return { deleted: group.length, photos }
+}
 export function editContribution(records: ReviewRecord[], input: Record<string, unknown>) {
   const record = records.find(row => row.request_id === input.request_id)
   if (!record) throw new HttpError(404, 'Contribution not found.')
