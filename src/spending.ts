@@ -35,15 +35,21 @@ function render() {
 async function load() {
   refresh.disabled = true; status.textContent = 'Loading spending…'
   try {
-    const response = await fetch('/api/spending')
+    const [response, sponsorsResponse] = await Promise.all([fetch('/api/spending'), fetch('/api/sponsorship?action=public')])
     if (!response.ok) throw new Error('Spending is unavailable. Please try Refresh in a moment.')
     const data: Spending = await response.json()
+    if (!sponsorsResponse.ok) throw new Error('Sponsor totals are unavailable. Please try Refresh in a moment.')
+    const sponsorsData: { sponsors: { amount: number }[] } = await sponsorsResponse.json()
+    const sponsored = sponsorsData.sponsors.reduce((sum, sponsor) => sum + Math.round(sponsor.amount * 100), 0)
+    const spent = data.expenses.reduce((sum, row) => sum + Math.round(row.amount * 100), 0)
     expenses = data.expenses
+    document.querySelector('#sponsored-total')!.textContent = money(sponsored / 100)
+    document.querySelector('#spending-balance')!.textContent = money((sponsored - spent) / 100)
     const previous = category.value
     category.replaceChildren(new Option('All categories', ''))
     for (const value of [...new Set(expenses.map(row => row.category || 'Other'))].sort()) category.add(new Option(value, value))
     category.value = [...category.options].some(option => option.value === previous) ? previous : ''
-    document.querySelector('#spending-total')!.textContent = money(expenses.reduce((sum, row) => sum + Math.round(row.amount * 100), 0) / 100)
+    document.querySelector('#spending-total')!.textContent = money(spent / 100)
     document.querySelector('#spending-updated')!.textContent = data.updated_at ? `Last published ${new Date(data.updated_at).toLocaleString()}` : 'Waiting for the first sheet update.'
     document.querySelector<HTMLElement>('#spending-content')!.hidden = false
     status.textContent = ''; render()
