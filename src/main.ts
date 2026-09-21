@@ -90,6 +90,15 @@ try {
   const title = element('h2', '', 'Good people. Great support.')
   title.id = 'wall-title'
   wallHeading.append(title, element('p', 'muted', 'Meet the people making it possible.'))
+  const searchLabel = element('label', 'sponsor-search', 'Search sponsors')
+  const search = element('input', '')
+  search.type = 'search'
+  search.placeholder = 'Name or @username'
+  search.autocomplete = 'off'
+  searchLabel.append(search)
+  wallHeading.append(searchLabel)
+  const searchStatus = element('p', 'sponsor-search-status')
+  searchStatus.setAttribute('role', 'status')
   const grid = element('div', 'sponsor-grid')
   const buttons: HTMLButtonElement[] = []
   const rows: HTMLButtonElement[] = []
@@ -168,7 +177,17 @@ try {
     })
   }, 30000)
   contributions.append(list)
-  wall.append(wallHeading, grid)
+  wall.append(wallHeading, searchStatus, grid)
+  search.addEventListener('input', () => {
+    const query = search.value.trim().toLowerCase()
+    let count = 0
+    buttons.forEach((button, index) => {
+      const sponsor = sponsors[index]
+      button.hidden = !sponsor.name.toLowerCase().includes(query) && !(`@${sponsor.user_id}`).toLowerCase().includes(query)
+      if (!button.hidden) count++
+    })
+    searchStatus.textContent = query ? (count ? `${count} sponsor${count === 1 ? '' : 's'} found` : 'No sponsors found. Try another name or username.') : ''
+  })
   if (sponsors.length) {
     select(0)
     wall.append(element('p', 'wall-hint', 'Every circle has a story. Select one to see their contribution.'))

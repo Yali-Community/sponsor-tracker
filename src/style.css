@@ -86,7 +86,7 @@ h1 { display: flex; align-items: center; gap: 10px; font-size: 25px; line-height
 .selected-heading { display: flex; align-items: center; gap: 12px; }
 .selected-heading .avatar { width: 40px; flex-shrink: 0; font-size: 13px; }
 .identity { min-width: 0; overflow-wrap: anywhere; }
-.identity h3 { font-size: 14px; font-weight: 600; }
+.identity h3 { font-size: 14px; font-weight: 700; }
 .social-id { color: var(--muted); font-size: 11px; margin-top: 3px; }
 .selected-amount { font-size: 13px; font-weight: 600; margin-top: 18px; }
 .notes { color: var(--muted); font-size: 12px; line-height: 1.7; margin-top: 8px; overflow-wrap: anywhere; white-space: pre-line; }
@@ -103,7 +103,7 @@ h1 { display: flex; align-items: center; gap: 10px; font-size: 25px; line-height
 .sponsor .avatar { width: min(100%, 80px); margin: 0 auto 13px; font-size: 22px; border: 1px solid #392e3314; transition: transform 450ms var(--ease), box-shadow 450ms var(--ease); }
 .sponsor:hover .avatar { transform: translateY(-5px) rotate(-4deg); box-shadow: 0 9px 16px #392e3312; }
 .sponsor[aria-pressed='true'] .avatar { outline: 2px solid #a84664; outline-offset: 4px; }
-.sponsor-name { display: block; font-size: 11px; line-height: 1.4; overflow-wrap: anywhere; }
+.sponsor-name { display: block; font-weight: 700; font-size: 11px; line-height: 1.4; overflow-wrap: anywhere; }
 .sponsor-amount { display: block; color: var(--muted); margin-top: 4px; font-size: 10px; font-variant-numeric: tabular-nums; }
 .wall-hint { font-size: 11px; color: var(--muted); line-height: 1.6; margin-top: 32px; }
 .empty-state, .error-state { padding: 48px 0; line-height: 1.8; }
@@ -414,3 +414,9 @@ textarea { resize: vertical; }
   .review-actions button { flex: 1; }
   .admin-login-panel { margin-block: 48px; }
 }
+
+.sponsor-search { display: block; max-width: 260px; margin-top: 18px; font-size: 12px; font-weight: 600; }
+.sponsor-search input { display: block; width: 100%; margin-top: 6px; padding: 10px 12px; font-size: 13px; }
+.sponsor-search-status { font-size: 12px; color: var(--muted); margin-bottom: 18px; }
+.sponsor-search-status:empty { display: none; }
+.activity-sentence strong:first-child { font-weight: 700; }
