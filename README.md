@@ -1,3 +1,7 @@
+## Storage migration
+
+Runtime storage now uses a separate private GitHub repository. See [setup and recovery instructions](integrations/github-storage.md). The Blob dependency is retained only for the migration utility. Production data must be restored before switching deployments.
+
 # Yali sponsor tracker
 
 A TypeScript + Vite sponsor wall with a QR payment form and private admin review.
@@ -14,21 +18,23 @@ The form does **not** verify payments. Admin approval is manual. Payment referen
 
 ## Private CSV and photos
 
-The live `admin.csv` is in a **private Vercel Blob store**, not GitHub or the public assets folder. It tracks pending/approved/rejected/revoked status, email delivery, and review timestamps. Admins can download it from the authenticated admin page. `data/admin.example.csv` contains only the column headers.
+The live `admin.csv` is in a **separate private GitHub repository**, not the public website repository or assets folder. It tracks pending/approved/rejected/revoked status, email delivery, and review timestamps. Admins can download it from the authenticated admin page. `data/admin.example.csv` contains only the column headers.
 
 Email addresses, transaction IDs, pending records, and pending photos are never returned by the public API. A profile photo is served through the API only after approval or to a signed-in admin. Names, handles, amounts, submission times, social IDs, photos and notes are published with the contributor's consent.
 
-The clean QR (with the original payment payload) and Yali logo are committed in `public/`. Uploaded profile photos stay in private Blob storage, with approved images served through the API; they are not committed to the public GitHub repo.
+The clean QR (with the original payment payload) and Yali logo are committed in `public/`. Uploaded profile photos stay in the private data repository, with approved images served through the API; they are not committed to the public GitHub repo.
 
-CSV writes use conditional ETags and retries to avoid losing concurrent submissions. Email delivery uses an atomic claim to prevent normal concurrent duplicate sends. Admins can retry failed emails; an abandoned claim expires after two minutes. SMTP delivery and storage are separate services, so an uncertain SMTP result may still lead to a duplicate email on retry.
+CSV writes use conditional GitHub file SHAs and retries to avoid losing concurrent submissions. Email delivery uses an atomic claim to prevent normal concurrent duplicate sends. Admins can retry failed emails; an abandoned claim expires after two minutes. SMTP delivery and storage are separate services, so an uncertain SMTP result may still lead to a duplicate email on retry.
 
-Preview branches, production and local development use separate storage namespaces. Preview test approvals cannot appear in production. API responses and private photos are not cached.
+Preview branches, production and local development use separate storage namespaces. Preview test approvals cannot appear in production. Private responses are uncached; approved public feeds and photos use a 60-second CDN cache.
 
 ## Environment variables
 
 Configure these **server-only** variables in Vercel (see `.env.example`):
 
-- `BLOB_READ_WRITE_TOKEN`: a private Vercel Blob store's read/write token.
+- `GITHUB_STORAGE_REPO`: private owner/repository.
+- `GITHUB_STORAGE_TOKEN`: server-only Contents read/write credential.
+- `GITHUB_STORAGE_BRANCH`: defaults to main.
 - `SMTP_USER` and `SMTP_PASS`: Gmail address and app password.
 - `ADMIN_EMAIL`: destination for admin sign-in links.
 - `ADMIN_SESSION_SECRET`: a cryptographically random secret of at least 32 characters.
@@ -56,7 +62,7 @@ The sample CSV supports quoted values, multiline notes, unique lowercase handles
 
 ## Deploy
 
-Import this repository into Vercel, connect the private Blob store and configure the environment variables. Vercel builds the Vite pages plus `api/sponsorship.ts`. PRs generate previews; merging the production branch deploys production.
+Import this repository into Vercel, configure and populate the private GitHub data repository and configure the environment variables. Vercel builds the Vite pages plus the sponsorship and spending APIs. PRs generate previews; merging the production branch deploys production.
 
 The UI preserves the pastel palette, supplied logo, Tamil thank-you lines, keyboard controls, reduced-motion preferences, image fallbacks and newest-first activity times.
 
@@ -64,7 +70,7 @@ The UI preserves the pastel palette, supplied logo, Tamil thank-you lines, keybo
 
 Open **All users** in admin to search every submitted username, including pending, rejected and revoked contributions. **Edit user** updates the name, username, email, social ID and profile photo across all contributions for that user. Username conflicts are blocked; changing the email invalidates verification proofs for the previous address. Photos can be replaced or removed.
 
-Expand **View contributions & edit amounts** to edit individual amounts, payment references and notes. Approved changes update the public wall and totals immediately. Submission/review timestamps remain system-managed; use the review queue to approve, reject or revoke. Concurrent edits are rejected with a refresh instruction, and edits wait while a status email is being sent. Profile corrections do not send extra emails.
+Expand **View contributions & edit amounts** to edit individual amounts, payment references and notes. Approved changes update the public wall and totals within 60 seconds. Submission/review timestamps remain system-managed; use the review queue to approve, reject or revoke. Concurrent edits are rejected with a refresh instruction, and edits wait while a status email is being sent. Profile corrections do not send extra emails.
 
 Profile icons are bundled Lucide SVGs, recorded in the optional `avatar_icon` CSV column. Older CSVs remain readable and keep initials when no photo or icon is saved. Uploaded photos take priority. Repeat contributions reuse the saved icon; admins can change it under All users.
 

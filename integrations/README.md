@@ -19,6 +19,6 @@ The Apps Script menu is for **Google Sheets**, not desktop Microsoft Excel. The 
 - Body: `{ "revision": 0, "expenses": [{ "id": "expense-001", "date": "2026-09-21", "description": "Venue hire", "category": "Events", "amount": "1500", "notes": "" }] }`.
 - Fetch the current revision before publishing. Conflicting updates return 409 instead of silently overwriting a newer snapshot. Publishing an identical snapshot is idempotent. Deliberate empty lists also require `confirm_empty: true`.
 
-Storage is private Vercel Blob, separate from sponsorship records and scoped by deployment environment/branch. Publishing expenses never changes sponsor balances. The passcode can only update spending; it cannot manage users. Rotate it by replacing the Vercel secret and the private script constant, then redeploy.
+Storage is a separate private GitHub repository, separate from sponsorship records and scoped by deployment environment/branch. Publishing expenses never changes sponsor balances. The passcode can only update spending; it cannot manage users. Rotate it by replacing the Vercel secret and the private script constant, then redeploy.
 
 Google reference: [custom menus](https://developers.google.com/apps-script/guides/menus), [HTTP requests](https://developers.google.com/apps-script/reference/url-fetch/url-fetch-app), [document locks](https://developers.google.com/apps-script/reference/lock/lock-service).

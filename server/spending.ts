@@ -1,5 +1,5 @@
 import { createHash, timingSafeEqual } from 'node:crypto'
-import { get, put, BlobPreconditionFailedError } from '@vercel/blob'
+import { get, put, StorageConflictError } from './storage.ts'
 import { namespace } from './security.ts'
 import { HttpError } from './validation.ts'
 
@@ -35,7 +35,10 @@ export function validateSpending(input: Record<string, unknown>): Expense[] {
 }
 export async function readSpending() {
   const blob = await get(`${namespace()}/spending.json`, { access: 'private', useCache: false, headers: { 'Accept-Encoding': 'identity' } })
-  if (!blob) return { data: { revision: 0, updated_at: '', expenses: [] } as Spending, etag: undefined }
+  if (!blob) {
+    if (process.env.VERCEL_ENV === 'production') throw new HttpError(503, 'Spending records are awaiting migration.')
+    return { data: { revision: 0, updated_at: '', expenses: [] } as Spending, etag: undefined }
+  }
   if (blob.statusCode !== 200) throw new Error('Unexpected storage response')
   const data = await new Response(blob.stream).json() as Spending
   return { data, etag: blob.blob.etag }
@@ -50,7 +53,7 @@ export async function replaceSpending(input: Record<string, unknown>) {
   try {
     await put(`${namespace()}/spending.json`, JSON.stringify(next), { access: 'private', addRandomSuffix: false, contentType: 'application/json', ...(etag ? { ifMatch: etag } : { allowOverwrite: false }) })
   } catch (error) {
-    if (error instanceof BlobPreconditionFailedError || (error instanceof Error && /already exists|precondition/i.test(error.message))) throw new HttpError(409, 'Another publish finished first. Review the sheet and publish again.')
+    if (error instanceof StorageConflictError || (error instanceof Error && /already exists|precondition/i.test(error.message))) throw new HttpError(409, 'Another publish finished first. Review the sheet and publish again.')
     throw error
   }
   return next

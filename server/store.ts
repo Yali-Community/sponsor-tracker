@@ -1,4 +1,4 @@
-import { get, put, BlobPreconditionFailedError } from '@vercel/blob'
+import { get, put, StorageConflictError } from './storage.ts'
 import Papa from 'papaparse'
 import { namespace, hash } from './security.ts'
 import { HttpError } from './validation.ts'
@@ -30,13 +30,15 @@ export function csvFor(records: ReviewRecord[], exportForExcel = false) {
   return Papa.unparse({ fields: reviewFields, data: records }, { escapeFormulae: exportForExcel })
 }
 function conflict(error: unknown) {
-  return error instanceof BlobPreconditionFailedError || (error instanceof Error && /already exists|precondition/i.test(error.message))
+  return error instanceof StorageConflictError || (error instanceof Error && /already exists|precondition/i.test(error.message))
 }
 export async function readRecords() {
-  if (!process.env.BLOB_READ_WRITE_TOKEN) throw new HttpError(503, 'Sponsorship submissions are not configured yet.')
-  // Compressed responses can carry weak ETags, which cannot be used for conditional writes.
+  // The storage adapter returns the GitHub file SHA as the conditional-write version.
   const blob = await get(`${namespace()}/admin.csv`, { access: 'private', useCache: false, headers: { 'Accept-Encoding': 'identity' } })
-  if (!blob) return { records: [] as ReviewRecord[], etag: undefined }
+  if (!blob) {
+    if (process.env.VERCEL_ENV === 'production') throw new HttpError(503, 'Sponsor records are awaiting migration. Please try again later.')
+    return { records: [] as ReviewRecord[], etag: undefined }
+  }
   if (blob.statusCode !== 200) throw new Error('Unexpected storage response')
   const csv = await new Response(blob.stream).text()
   const parsed = Papa.parse<ReviewRecord>(csv, { header: true, skipEmptyLines: true })
@@ -46,7 +48,9 @@ export async function readRecords() {
 export async function updateRecords<T>(change: (records: ReviewRecord[]) => T): Promise<T> {
   for (let attempt = 0; attempt < 6; attempt++) {
     const { records, etag } = await readRecords()
+    const before = csvFor(records)
     const result = change(records)
+    if (csvFor(records) === before) return result
     try {
       await put(`${namespace()}/admin.csv`, csvFor(records), {
         access: 'private', addRandomSuffix: false, contentType: 'text/csv',

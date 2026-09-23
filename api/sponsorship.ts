@@ -1,6 +1,6 @@
 import type { IncomingMessage, ServerResponse } from 'node:http'
 import { randomInt, randomUUID } from 'node:crypto'
-import { get, put, del } from '@vercel/blob'
+import { get, put, del } from '../server/storage.ts'
 import { validateSubmission, HttpError } from '../server/validation.ts'
 import { readRecords, updateRecords, claimOnce, limit, csvFor, publicRecord, publicSponsors, type ReviewRecord } from '../server/store.ts'
 import { createSponsorChallenge, confirmSponsorCode } from '../server/sponsor-auth.ts'
@@ -29,6 +29,7 @@ export default async function handler(req: Request, res: ServerResponse) {
     if (req.method === 'GET') {
       if (action === 'public') {
         const { records } = await readRecords()
+        res.setHeader('Vercel-CDN-Cache-Control', 'public, s-maxage=60')
         return json(res, 200, { sponsors: publicSponsors(records), contributions: records.filter(record => record.status === 'approved').map(publicRecord) })
       }
       if (action === 'check-user-id') {
@@ -45,6 +46,7 @@ export default async function handler(req: Request, res: ServerResponse) {
         if (!blob || blob.statusCode !== 200) throw new HttpError(404, 'Photo not found.')
         res.setHeader('Content-Type', record.photo_type)
         res.setHeader('Content-Security-Policy', "default-src 'none'; sandbox")
+        if (record.status === 'approved') res.setHeader('Vercel-CDN-Cache-Control', 'public, s-maxage=60')
         return res.end(Buffer.from(await new Response(blob.stream).arrayBuffer()))
       }
       requireAdmin(req.headers.cookie)
