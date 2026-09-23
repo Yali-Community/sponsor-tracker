@@ -13,6 +13,7 @@ import { sendEmail } from '../server/email.ts'
 import { notify } from '../server/notifications.ts'
 import { reviewRequest } from '../server/review.ts'
 import { adminUsers, editUser, editContribution, contributionVersion, deleteUser } from '../server/users.ts'
+import { requestAdminLogin } from '../server/admin-login.ts'
 
 type Request = IncomingMessage & { body?: unknown }
 function json(res: ServerResponse, status: number, value: unknown) {
@@ -97,13 +98,7 @@ export default async function handler(req: Request, res: ServerResponse) {
       return json(res, 200, { verification: confirmSponsorCode(challenge, String(input.code || '')) })
     }
     if (action === 'login-link') {
-      await limit('admin-login', 300)
-      const token = signToken('login', 600)
-      const origin = req.headers.origin!
-      const adminEmail = process.env.ADMIN_EMAIL
-      if (!adminEmail) throw new HttpError(503, 'Admin email is not configured.')
-      await sendEmail(adminEmail, 'Sign in to Yali Sponsors admin', `Open this link within 10 minutes to review sponsorships:\n\n${origin}/admin.html#token=${token}\n\nIf you did not request this link, you can ignore it.`)
-      return json(res, 200, { message: 'A sign-in link has been sent to the admin email.' })
+      return json(res, 200, await requestAdminLogin(req.headers.origin!))
     }
     if (action === 'login') {
       const token = typeof input.token === 'string' ? input.token : ''

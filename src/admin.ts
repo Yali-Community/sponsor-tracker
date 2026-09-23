@@ -40,7 +40,7 @@ async function api(action: string, data?: object) {
   const result = await response.json()
   if (!response.ok) {
     if (response.status === 401) { generation++; login.hidden = false; content.hidden = true; records = []; list.replaceChildren(); users.clear(); quick.clear() }
-    throw new Error(result.error || 'Request failed.')
+    throw Object.assign(new Error(result.error || 'Request failed.'), { retryAfter: Number(result.retryAfter) || 0 })
   }
   return result
 }
@@ -155,9 +155,21 @@ document.querySelector('#admin-refresh')!.addEventListener('click', () => void l
 document.querySelector('#send-login')!.addEventListener('click', async event => {
   const button = event.currentTarget as HTMLButtonElement
   button.disabled = true
-  try { status.textContent = (await api('login-link', {})).message }
-  catch (error) { status.textContent = (error as Error).message }
-  finally { button.disabled = false }
+  let retryAfter = 0
+  try { const result = await api('login-link', {}); status.textContent = result.message; retryAfter = result.retryAfter }
+  catch (error) { status.textContent = (error as Error).message; retryAfter = (error as Error & { retryAfter?: number }).retryAfter || 0 }
+  if (retryAfter > 0) {
+    const readyAt = Date.now() + retryAfter * 1000
+    const originalContent = [...button.childNodes]
+    const update = () => {
+      const seconds = Math.max(0, Math.ceil((readyAt - Date.now()) / 1000))
+      if (seconds) button.textContent = `Resend link in ${seconds}s`
+      else button.replaceChildren(...originalContent)
+      if (!seconds) { clearInterval(timer); button.disabled = false }
+    }
+    const timer = window.setInterval(update, 1000)
+    update()
+  } else { button.disabled = false }
 })
 document.querySelector('#admin-logout')!.addEventListener('click', async () => {
   signingOut = true
