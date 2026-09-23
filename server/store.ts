@@ -33,7 +33,7 @@ function conflict(error: unknown) {
   return error instanceof StorageConflictError || (error instanceof Error && /already exists|precondition/i.test(error.message))
 }
 export async function readRecords() {
-  // Compressed responses can carry weak ETags, which cannot be used for conditional writes.
+  // The storage adapter returns the GitHub file SHA as the conditional-write version.
   const blob = await get(`${namespace()}/admin.csv`, { access: 'private', useCache: false, headers: { 'Accept-Encoding': 'identity' } })
   if (!blob) {
     if (process.env.VERCEL_ENV === 'production') throw new HttpError(503, 'Sponsor records are awaiting migration. Please try again later.')
