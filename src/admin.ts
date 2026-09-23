@@ -97,7 +97,7 @@ function render() {
     const details = node('dl', '', 'review-details')
     for (const [label, value] of [
       ['Email', record.email || 'Not provided — add in All users if needed'], ['Social ID', record.social_id || '—'],
-      ['Submitted at', new Date(record.submitted_at).toLocaleString()], [record.entry_source === 'admin' ? 'Admin entry reference' : 'Payment reference', record.transaction_id],
+      [record.entry_source === 'email_recovery' ? 'First email notification' : 'Submitted at', new Date(record.submitted_at).toLocaleString()], [record.entry_source === 'admin' ? 'Admin entry reference' : 'Payment reference', record.transaction_id || 'Not recovered'],
       ['Note', record.notes || '—'],
       ['Email delivery', !record.email ? 'No email address added' : (record.status === 'pending' ? record.pending_email : record.decision_email) === 'not_required' ? 'Not sent for admin entry' : (record.status === 'pending' ? record.pending_email : record.decision_email) || 'waiting'],
     ]) details.append(node('dt', label), node('dd', value))

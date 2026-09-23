@@ -87,3 +87,9 @@ Existing usernames keep their saved profile. New usernames use the username as t
 Open **View spending** for expenses, totals, search and category filters. Follow [Google Sheets setup](integrations/README.md) to publish the sheet. Configure server-only `SPENDING_SYNC_SECRET`; the public script is a template and the separately supplied private copy contains the passcode.
 
 In **All users**, expand contributions and choose **Delete user & contributions**. Type the username to permanently remove the profile and all contributions, including approved amounts from public totals. This does not refund payments. Concurrent changes require a refresh before deletion.
+
+### Recovering contributions from status emails
+
+Run `node --env-file=.env.local --experimental-strip-types scripts/restore-email-records.mjs /private/recovered-records.json` with the intended storage environment. Keep recovery inputs and email evidence outside this public repository. The importer only adds approved non-test requests, skips existing request IDs, preserves current profiles, and rejects conflicting emails. It does not send notifications.
+
+Recovered entries are marked `email_recovery`. Missing payment references, social links and photos stay blank; admins can edit the amount/profile without inventing a bank reference. Displayed dates use the first notification time, with a public note explaining that approximation. Later edits, deletions and manual entries absent from emails cannot be reconstructed automatically.
