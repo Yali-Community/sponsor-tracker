@@ -38,7 +38,7 @@ export function editUser(records: ReviewRecord[], input: Record<string, unknown>
   if (input.version !== userVersion(group[0])) throw new HttpError(409, 'This profile changed. Close the editor and refresh before editing again.')
   group.forEach(editable)
   const validated = validateSubmission({ ...anchor, user_id: input.user_id, name: input.name, email: input.email,
-    social_id: input.social_id, photo: input.photo, avatar_icon: input.avatar_icon ?? anchor.avatar_icon ?? '', consent: true }, Date.now(), !anchor.email)
+    social_id: input.social_id, photo: input.photo, avatar_icon: input.avatar_icon ?? anchor.avatar_icon ?? '', consent: true }, Date.now(), !anchor.email, anchor.entry_source === 'email_recovery')
   if (records.some(row => !group.includes(row) && row.user_id.toLowerCase() === validated.user_id)) {
     throw new HttpError(409, 'This username belongs to another user. Choose a different username.')
   }
@@ -66,8 +66,8 @@ export function editContribution(records: ReviewRecord[], input: Record<string, 
   if (!record) throw new HttpError(404, 'Contribution not found.')
   if (input.version !== contributionVersion(record)) throw new HttpError(409, 'This contribution changed. Close the editor and refresh before editing again.')
   editable(record)
-  const validated = validateSubmission({ ...record, amount: input.amount, transaction_id: input.transaction_id, notes: input.notes, consent: true }, Date.now(), !record.email)
-  if (records.some(row => row.request_id !== record.request_id && row.transaction_id.toLowerCase() === validated.transaction_id.toLowerCase())) {
+  const validated = validateSubmission({ ...record, amount: input.amount, transaction_id: input.transaction_id, notes: input.notes, consent: true }, Date.now(), !record.email, record.entry_source === 'email_recovery')
+  if (validated.transaction_id && records.some(row => row.request_id !== record.request_id && row.transaction_id.toLowerCase() === validated.transaction_id.toLowerCase())) {
     throw new HttpError(409, 'This payment reference belongs to another contribution.')
   }
   record.amount = validated.amount

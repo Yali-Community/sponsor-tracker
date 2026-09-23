@@ -21,7 +21,7 @@ export interface Submission {
   avatar_icon: string
   photo?: { bytes: Buffer; type: string; extension: string }
 }
-export function validateSubmission(input: Record<string, unknown>, now = Date.now(), allowMissingEmail = false): Submission {
+export function validateSubmission(input: Record<string, unknown>, now = Date.now(), allowMissingEmail = false, allowMissingReference = false): Submission {
   function text(key: string, max: number, required = true) {
     const value = input[key]
     const label = key === 'user_id' ? 'username' : key.replaceAll('_', ' ')
@@ -39,7 +39,7 @@ export function validateSubmission(input: Record<string, unknown>, now = Date.no
   const amount = text('amount', 12)
   if (!/^\d+(\.\d{1,2})?$/.test(amount) || Number(amount) <= 0 || Number(amount) > 1000000) throw new HttpError(400, 'Enter an amount between ₹0.01 and ₹10,00,000.')
   const paid_at = new Date(now).toISOString()
-  const transaction_id = text('transaction_id', 100)
+  const transaction_id = text('transaction_id', 100, !allowMissingReference)
   if (/[\r\n]/.test(transaction_id)) throw new HttpError(400, 'Enter a valid payment reference.')
   if (input.consent !== true) throw new HttpError(400, 'Please agree to publish your sponsor details after approval.')
   if (input.website) throw new HttpError(400, 'Unable to submit this request.')

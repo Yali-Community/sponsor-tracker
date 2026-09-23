@@ -68,7 +68,7 @@ export function userManager(api: (action: string, data?: object) => Promise<any>
   function editContribution(record: Review) {
     open('Edit contribution', `For @${record.user_id}. Approved amount and note changes appear publicly immediately. Review status and submission time stay unchanged.`, 'edit-contribution', record)
     field('Amount (₹)', 'amount', record.amount, 'number', 12)
-    field('Payment reference', 'transaction_id', record.transaction_id, 'text', 100)
+    field(record.entry_source === 'email_recovery' ? 'Payment reference (not recovered; optional)' : 'Payment reference', 'transaction_id', record.transaction_id, 'text', 100, record.entry_source !== 'email_recovery')
     const label = element('label', 'Notes (optional)', 'editor-full')
     const note = document.createElement('textarea')
     note.name = 'notes'; note.value = record.notes; note.maxLength = 500; note.rows = 3
