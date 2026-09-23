@@ -1,3 +1,7 @@
+## Storage migration
+
+Runtime storage now uses a separate private GitHub repository. See [setup and recovery instructions](integrations/github-storage.md). The Blob dependency is retained only for the migration utility. Production data must be restored before switching deployments.
+
 # Yali sponsor tracker
 
 A TypeScript + Vite sponsor wall with a QR payment form and private admin review.
